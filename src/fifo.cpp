@@ -32,7 +32,7 @@ Fifo::~Fifo()  {
 	}
 }
 
-void Fifo::push(T val) {
+void Fifo::push(T* val) {
 	Node *n = new Node();
 	n->x = val;
 
@@ -49,9 +49,9 @@ void Fifo::push(T val) {
 	}
 }
 
-T Fifo::get() {
+T* Fifo::get() {
 	Node *n = head;
-	T ret = n->x;
+	T* ret = n->x;
 	head = head->next;
 	delete n;
 	return ret;

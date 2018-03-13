@@ -23,15 +23,15 @@ class Fifo
 {
 	struct Node
        	{
-		T x;
+		T* x;
 		Node *next;
-	}
+	};
 
 public:
 	Fifo();
 	~Fifo();
-	void push(T val);
-	T get();
+	void push(T* val);
+	T* get();
 
 private : 
 	Node *head;

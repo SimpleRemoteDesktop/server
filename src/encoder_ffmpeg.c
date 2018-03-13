@@ -147,7 +147,7 @@ extern "C" {
 				NULL
 				);
 	}
-	void encoder_encodeFrame(unsigned char * srcData[], unsigned char **dstData, unsigned long *frameSize)
+	void encoder_encodeFrame(Image* image, Frame* outputFrame)
 	{
 		av_init_packet(&pkt);
 		pkt.data = NULL;    // packet data will be allocated by the encoder
@@ -170,8 +170,8 @@ extern "C" {
 		if (got_output) {
 
 			//fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
-			*dstData = pkt.data;
-			*frameSize = pkt.size;
+			outputFrame->data = pkt.data;
+			outputFrame->size = pkt.size;
 		}
 
 	}

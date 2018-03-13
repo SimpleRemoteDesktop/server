@@ -14,7 +14,7 @@ extern "C" {
 	static XShmSegmentInfo __xshminfo;
 
 
-	int display_init(const char * displayname, int * desktopWidth, int * desktopHeight, int *desktopDepth) 
+	int SRD_X11_display_init(const char * displayname, int * desktopWidth, int * desktopHeight, int *desktopDepth) 
 	{
 		// init
 		int ignore = 0;
@@ -76,7 +76,7 @@ extern "C" {
 
 	}
 
-	void display_image( Image *image, bool withPointer )
+	void SRD_X11_display_image( Image *image, bool withPointer )
 	{
 
 		if(XShmGetImage(display, rootWindow, ximage, 0, 0, XAllPlanes()) == 0) {
@@ -96,7 +96,7 @@ extern "C" {
 		}
 
 	}
-	void display_keypress_with_keycode( int keycode, bool isDown )
+	void SRD_X11_display_keypress_with_keycode( int keycode, bool isDown )
 	{
 		XLockDisplay(display);
 		XTestGrabControl(display, True);
@@ -106,7 +106,7 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void display_keypress_with_keysym( int keysym, bool isDown )
+	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown )
 	{
 
 		XLockDisplay(display);
@@ -117,7 +117,7 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void display_mouse_move( int x, int y )
+	void SRD_X11_display_mouse_move( int x, int y )
 	{
 		XLockDisplay(display);
 		XTestGrabControl(display, True);
@@ -127,7 +127,7 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void display_mouse_button(int button, bool isDown ) 
+	void SRD_X11_display_mouse_button(int button, bool isDown ) 
 	{
 
 		XLockDisplay(display);
@@ -142,7 +142,7 @@ extern "C" {
 	 * from x11grab.c in ffmpeg project
 	 */
 
-	void paint_mouse_pointer(Image *image)
+	void SRD_X11_paint_mouse_pointer(Image *image)
 	{
 		int x_off = 0;
 		int y_off = 0;
@@ -189,7 +189,7 @@ extern "C" {
 		XFree(xcim);
 		xcim = NULL;
 	}
-	void close() 
+	void SRD_X11_display_close() 
 	{
 		if(display) {
 			XCloseDisplay(display);

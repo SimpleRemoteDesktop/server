@@ -1,9 +1,18 @@
 #include "network.hpp"
+#include "main.hpp"
 
-boost::lockfree::queue<int> FrameToSockQueue(128);
+
+using namespace std;
+using namespace boost::asio;
+using ip::tcp;
+
+
+typedef boost::shared_ptr<tcp::socket> socket_ptr;
+
 
 void new_incoming_socket_handler(socket_ptr sock)
 {
+	boost::system::error_code error;
 	try
 	{
 		sock->set_option(tcp::no_delay(true));
@@ -32,7 +41,14 @@ void new_incoming_socket_handler(socket_ptr sock)
 
 void socket_sender_thread_fn(socket_ptr sock)
 {
-	 // TODO send data thread to socket
+	Frame* frame = queueToNetwork->get();
+	if(frame) 
+	{
+		boost::asio::write(*sock, buffer(frame->data, frame->size));
+	} else {
+		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+	}
+
 }
 
 void SRD_network_listen_tcp_socket(io_service& io_service, short port)
@@ -57,12 +73,11 @@ void SRD_server_init_listen()
 	try
 	{
 		io_service io_service;
-
 		SRD_network_listen_tcp_socket(io_service, 8001);
 	}
-	catch (exception& e)
+	catch (std::exception& e)
 	{
-		cerr << "Exception: " << e.what() << "\n";
+		//TODO
 	}
 
 }

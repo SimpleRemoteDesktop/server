@@ -8,13 +8,17 @@ void video_thread_fn(float duration)
 	while(true)
 	{
 		boost::posix_time::ptime t1 = boost::posix_time::second_clock::local_time();	
-		image = ( Image*  )malloc(sizeof(Image));
-		image->data = (char*) malloc(sizeof(char)*width*height*4);	
+		Image* image = ( Image*  )malloc(sizeof(Image));
+		image->data = (char*) malloc(sizeof(char)*config->width*config->height*4);	
 		display_image(image, false);
-		unsigned char * dstData = NULL;
-		unsigned long frameSize = 0;
-		encoder_encodeFrame( srcData, &dstData, &frameSize );
-		//TODO send data to network buffer;
+
+		Frame* frame = new Frame();
+		frame->data = NULL;
+		frame->size = 0;
+	
+		encoder_encodeFrame(image, frame);
+		queueToNetwork->push(frame);
+
 		boost::posix_time::ptime t2 = boost::posix_time::second_clock::local_time();
 		boost::posix_time::time_duration diff = t2 - t1;
 
@@ -75,7 +79,11 @@ void handle_incoming_message(Message* m)
 
 int main(int argc, const char* argv[])
 {
+	config = new Configuration();
+	queueToNetwork = new Fifo();
+	queueFromNetwork = new Fifo();
 	cout << " Simple Remote desktop server version 0.2" << endl;
 	// start network service
-	SRD_server_init_listen();	
+	SRD_server_init_listen();
+		
 }
