@@ -1,6 +1,10 @@
 
+
 #ifndef XDISPLAY_H
 #define XDISPLAY_H
+
+#include "config.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -28,7 +32,7 @@ extern "C" {
 	static int MOUSE_RIGHT = 3;
 
 
-	struct Image {
+	typedef struct {
 		int width;
 		int height;
 		char * data;
@@ -36,9 +40,9 @@ extern "C" {
 		int bytes_per_line;
 		int bits_per_pixel;
 
-	};
+	} Image;
 
-	int SRD_X11_display_init(const char * displayname, int * desktopWidth, int * desktopHeight, int *desktopDepth);
+	int SRD_X11_display_init(const char * displayname, Configuration* config);
 	void SRD_X11_display_image( Image *image, bool withPointer );
 	void SRD_X11_display_keypress_with_keycode( int keycode, bool isDown );
 	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown );

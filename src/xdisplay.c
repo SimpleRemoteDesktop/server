@@ -1,8 +1,9 @@
+#include "xdisplay.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include "xdisplay.h"
 
 	//X11GRAB vars
 	static int screenNumber;
@@ -14,7 +15,7 @@ extern "C" {
 	static XShmSegmentInfo __xshminfo;
 
 
-	int SRD_X11_display_init(const char * displayname, int * desktopWidth, int * desktopHeight, int *desktopDepth) 
+	int SRD_X11_display_init(const char * displayname, Configuration* config) 
 	{
 		// init
 		int ignore = 0;
@@ -43,17 +44,17 @@ extern "C" {
 			printf("cannot obtain screen #%d\n", screenNumber);
 		}
 		// get screen hight, width, depth
-		*desktopWidth = XDisplayWidth(display, screenNumber);
-		*desktopHeight = XDisplayHeight(display, screenNumber);
-		*desktopDepth = XDisplayPlanes(display, screenNumber);
+		config->width = XDisplayWidth(display, screenNumber);
+		config->height = XDisplayHeight(display, screenNumber);
+		int *desktopDepth = XDisplayPlanes(display, screenNumber);
 		printf("X-Window-init: dimension: %dx%dx%d @ %d/%d\n",
-				*desktopWidth, *desktopHeight, *desktopDepth,
+				config->width, config->height, *desktopDepth,
 				screenNumber, XScreenCount(display));
 		//create image context
 		if((ximage = XShmCreateImage(display,
 						XDefaultVisual(display, screenNumber),
 						*desktopDepth, ZPixmap, NULL, &__xshminfo,
-						*desktopWidth, *desktopHeight)) == NULL) {
+						config->width, config->height)) == NULL) {
 			printf("XShmCreateImage failed.\n");
 		}
 
@@ -92,7 +93,7 @@ extern "C" {
 		image->bytes_per_line = ximage->bytes_per_line;
 		if(withPointer)
 		{
-			paint_mouse_pointer(image);
+			SRD_X11_paint_mouse_pointer(image);
 		}
 
 	}

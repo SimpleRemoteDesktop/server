@@ -1,7 +1,4 @@
-#include "utils.h"
-// FFMPEG IMPORT
-#include <stdint.h>
-// compatibility with newer API
+#include "encoder_ffmpeg.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,10 +13,8 @@ extern "C" {
 #include "libavutil/samplefmt.h"
 #include <libswscale/swscale.h>
 
+#include <stdint.h>
 
-
-
-#include "encoder_ffmpeg.h"
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <sys/ipc.h>
@@ -49,15 +44,15 @@ extern "C" {
 	
 	struct DesktopDimension desktop;
 
-	void encoder_init(int *desktopWidth,int *desktopHeight, int *frameWidth,int *frameHeight, int * bit_rate, int * fps, int pix_fmt_int )
+	void encoder_init(Configuration* config, int *frameWidth,int *frameHeight, int * bit_rate, int * fps, int pix_fmt_int )
 	{
 		
 		//FFMPEG CODEC INIT
 
 		avcodec_register_all();
 	
-		desktop.width = *desktopWidth;
-		desktop.height = *desktopHeight;
+		desktop.width = config->width;
+		desktop.height = config->height;
 		fprintf(stdout, "desktop width %i, height %i\n", desktop.width, desktop.height);	
 
 		/* find the mpeg1 video encoder */
@@ -135,8 +130,8 @@ extern "C" {
 
 		// initialize SWS context for software scaling
 		sws_ctx = sws_getContext(
-				*desktopWidth,
-				*desktopHeight,
+				config->width,
+				config->height,
 				AV_PIX_FMT_BGRA,
 				c->width,
 				c->height,
@@ -156,7 +151,7 @@ extern "C" {
 		//const int inLinesize[1] = { 4 * c->width }; // bpp
 		const int inLinesize[1] = { 4 * desktop.width }; // bpp
 		//sws_scale(sws_ctx, (uint8_t const * const *) srcData,	inLinesize, 0, c->height, frame->data, frame->linesize);
-		sws_scale(sws_ctx, (uint8_t const * const *) srcData,	inLinesize, 0, desktop.height, frame->data, frame->linesize);
+		sws_scale(sws_ctx, (uint8_t const * const *) image->data, inLinesize, 0, desktop.height, frame->data, frame->linesize);
 		frame->pts = i;
 		i++;
 		/* encode the image */

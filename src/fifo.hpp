@@ -15,25 +15,59 @@
  * 
  */
 
+
 #ifndef FIFO_H
 #define FIFO_H
 
-template <typename T>
+template <class T>
 class Fifo
 {
 	struct Node
-       	{
+	{
 		T* x;
 		Node *next;
 	};
 
-public:
-	Fifo();
-	~Fifo();
-	void push(T* val);
-	T* get();
+	public:
+	Fifo(){
+		head = nullptr;
+	}
+	~Fifo() {
+		Node *next = head;
 
-private : 
+		while(next) {
+			Node *deleteMe = next;
+			next = next->next;
+			delete deleteMe;
+		}
+
+	}
+	void push(T* val) {
+		Node *n = new Node();
+		n->x = val;
+
+
+		if(head == nullptr)
+		{
+			head = n;
+		} else {
+			Node* current = head;
+			while(current->next != nullptr) {
+				current = current->next;
+			}
+			current->next = n;
+		}
+	}
+	T* get() {
+		Node *n = head;
+		T* ret = n->x;
+		head = head->next;
+		delete n;
+		return ret;
+
+	}
+
+	private : 
 	Node *head;
 };
 

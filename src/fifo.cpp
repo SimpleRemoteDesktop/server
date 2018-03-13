@@ -15,14 +15,16 @@
  * 
  */
 
-#include "fifo.h"
+#include "fifo.hpp"
 
+template <class T>
+Fifo<T>::Fifo() {
 
-Fifo::Fifo() {
-	head = NULL;
+	Fifo<int>* test = new Fifo<int>();
 }
 
-Fifo::~Fifo()  {
+template <class T>
+Fifo<T>::~Fifo()  {
 	Node *next = head;
 
 	while(next) {
@@ -32,24 +34,26 @@ Fifo::~Fifo()  {
 	}
 }
 
-void Fifo::push(T* val) {
+template <class T>
+void Fifo<T>::push(T* val) {
 	Node *n = new Node();
 	n->x = val;
 
 
-	if(head == NULL)
+	if(head == nullptr)
 	{
 		head = n;
 	} else {
-		Node* current = header;
-		while(current->next != NULL) {
+		Node* current = head;
+		while(current->next != nullptr) {
 			current = current->next;
 		}
 		current->next = n;
 	}
 }
 
-T* Fifo::get() {
+template <class T>
+T* Fifo<T>::get() {
 	Node *n = head;
 	T* ret = n->x;
 	head = head->next;
