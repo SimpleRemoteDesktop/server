@@ -4,7 +4,7 @@ project(SimpleRemoteDesktop_Server)
 set(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/)
 
 set (CMAKE_CXX_STANDARD 11)
-set(CMAKE_EXE_LINKER_FLAGS, " -lXtst -lX11 -lXfixes -lavutil -lavcodec -lpthread -lswscale")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_BUILD_TYPE Debug)
 
 add_subdirectory(src)
