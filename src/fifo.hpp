@@ -60,11 +60,14 @@ class Fifo
 	}
 	T* get() {
 		Node *n = head;
-		T* ret = n->x;
-		head = head->next;
-		delete n;
-		return ret;
+		if(n != nullptr) {
+			T* ret = n->x;
+			head = head->next;
+			delete n;
+			return ret;
 
+
+		}
 	}
 
 	private : 

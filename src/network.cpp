@@ -24,7 +24,7 @@ void new_incoming_socket_handler(socket_ptr sock)
 				return; // Connection closed cleanly by peer.
 			else if (error)
 				throw boost::system::system_error(error); // Some other error.
-
+			std::cout << "receiving new message" << std::endl;
 			m = (Message*)data;
 			handle_incoming_message(m);
 		}
@@ -59,6 +59,7 @@ void SRD_network_listen_tcp_socket(io_service& io_service, short port)
 	{
 		socket_ptr sock(new tcp::socket(io_service));
 		a.accept(*sock);
+		std::cout << "new socket connected" << std::endl;
 		boost::thread socketReceiveThead(boost::bind(new_incoming_socket_handler, sock));
 		boost::thread socketSendThread(boost::bind(socket_sender_thread_fn, sock));
 

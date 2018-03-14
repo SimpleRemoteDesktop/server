@@ -75,6 +75,7 @@ void handle_incoming_message(Message* message)
 			SRD_X11_display_mouse_button(message->button, false);
 			break;
 		case 6:
+			std::cout << "receive start request" << std::endl;
 			start_video(message->codec_width, message->codec_height, message->bandwidth, message->fps, message->sdl);
 			break;
 		case 7:
