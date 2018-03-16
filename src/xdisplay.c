@@ -46,14 +46,13 @@ extern "C" {
 		// get screen hight, width, depth
 		config->width = XDisplayWidth(display, screenNumber);
 		config->height = XDisplayHeight(display, screenNumber);
-		int *desktopDepth = XDisplayPlanes(display, screenNumber);
+		int desktopDepth = XDisplayPlanes(display, screenNumber);
 		printf("X-Window-init: dimension: %dx%dx%d @ %d/%d\n",
-				config->width, config->height, *desktopDepth,
-				screenNumber, XScreenCount(display));
+				config->width, config->height, desktopDepth, screenNumber, XScreenCount(display));
 		//create image context
 		if((ximage = XShmCreateImage(display,
 						XDefaultVisual(display, screenNumber),
-						*desktopDepth, ZPixmap, NULL, &__xshminfo,
+						desktopDepth, ZPixmap, NULL, &__xshminfo,
 						config->width, config->height)) == NULL) {
 			printf("XShmCreateImage failed.\n");
 		}

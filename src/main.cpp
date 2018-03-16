@@ -60,19 +60,19 @@ void handle_incoming_message(Message* message)
 
 	switch (message->type) {
 		case 1:
-			SRD_X11_display_keypress_with_keysym(message->keycode, true);
+			//SRD_X11_display_keypress_with_keysym(message->keycode, true);
 			break;
 		case 2:
-			SRD_X11_display_keypress_with_keysym(message->keycode, false);
+			//SRD_X11_display_keypress_with_keysym(message->keycode, false);
 			break;
 		case 3:
-			SRD_X11_display_mouse_move(message->x, message->y);
+			//SRD_X11_display_mouse_move(message->x, message->y);
 			break;
 		case 4:
-			SRD_X11_display_mouse_button(message->button, true);
+			//SRD_X11_display_mouse_button(message->button, true);
 			break;
 		case 5:
-			SRD_X11_display_mouse_button(message->button, false);
+			//SRD_X11_display_mouse_button(message->button, false);
 			break;
 		case 6:
 			std::cout << "receive start request" << std::endl;

@@ -147,11 +147,11 @@ extern "C" {
 		av_init_packet(&pkt);
 		pkt.data = NULL;    // packet data will be allocated by the encoder
 		pkt.size = 0;
-
+		unsigned char* srcData[1] = {(unsigned char * ) image->data}; // convert to array of pointer for plane
 		//const int inLinesize[1] = { 4 * c->width }; // bpp
 		const int inLinesize[1] = { 4 * desktop.width }; // bpp
 		//sws_scale(sws_ctx, (uint8_t const * const *) srcData,	inLinesize, 0, c->height, frame->data, frame->linesize);
-		sws_scale(sws_ctx, (uint8_t const * const *) image->data, inLinesize, 0, desktop.height, frame->data, frame->linesize);
+		sws_scale(sws_ctx, (uint8_t const * const *) srcData, inLinesize, 0, desktop.height, frame->data, frame->linesize);
 		frame->pts = i;
 		i++;
 		/* encode the image */
@@ -164,7 +164,7 @@ extern "C" {
 
 		if (got_output) {
 
-			//fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
+			fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
 			outputFrame->data = pkt.data;
 			outputFrame->size = pkt.size;
 		}

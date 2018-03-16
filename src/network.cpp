@@ -20,10 +20,16 @@ void new_incoming_socket_handler(socket_ptr sock)
 		while(true)
 		{
 			size_t length = sock->read_some(buffer(data), error);
-			if (error == error::eof)
+			if (error == error::eof) {
+				std::cout << "connection close clearly must do action" << std::endl;
 				return; // Connection closed cleanly by peer.
-			else if (error)
+
+			}
+			else if (error) {
+				std::cout << "network error send stop command" << std::endl;
+
 				throw boost::system::system_error(error); // Some other error.
+			}
 			std::cout << "receiving new message" << std::endl;
 			m = (Message*)data;
 			handle_incoming_message(m);
@@ -40,14 +46,25 @@ void new_incoming_socket_handler(socket_ptr sock)
 
 void socket_sender_thread_fn(socket_ptr sock)
 {
-	Frame* frame = queueToNetwork->get();
-	if(frame) 
-	{
-		boost::asio::write(*sock, buffer(frame->data, frame->size));
-	} else {
-		boost::this_thread::sleep(boost::posix_time::milliseconds(1));
-	}
+	int counter = 1;
 
+	while(true) 
+	{
+		Frame* frame = queueToNetwork->get();
+		if(frame) 
+		{
+			void* fullFrame = malloc(frame->size + 8);
+			memcpy(fullFrame, (void *) &counter, 4);
+			memcpy(fullFrame+4, (void *) &frame->size, 4);
+			memcpy(fullFrame+8, (void *) frame->data, frame->size);
+			boost::asio::write(*sock, buffer(fullFrame, sizeof(frame->size+8)));
+			counter++;
+		} else {
+			boost::this_thread::sleep(boost::posix_time::milliseconds(1));
+		}
+
+
+	}
 }
 
 void SRD_network_listen_tcp_socket(io_service& io_service, short port)
