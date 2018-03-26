@@ -17,12 +17,12 @@
 Configuration* config;
 Fifo<Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
-
+bool video_thread_is_running = false;
 
 void video_thread_fn(float duration)
 {
 	BOOST_LOG_TRIVIAL(info) << "Starting new video thread with loop duration : " << duration << " ms";
-	while(true)
+	while(video_thread_is_running)
 	{
 		boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time(); 
 		Image* image = ( Image*  )malloc(sizeof(Image));
@@ -41,7 +41,8 @@ void video_thread_fn(float duration)
 		BOOST_LOG_TRIVIAL(debug) << "encoder time : " << diff.total_milliseconds();
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(duration - diff.total_milliseconds()));
-	}
+	} 
+	
 }
 
 void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sdl)
@@ -51,13 +52,15 @@ void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sd
 	BOOST_LOG_TRIVIAL(info) << "fps : " << fps << ", duration " << duration;
 	SRD_X11_display_init(displayname, config);
 	encoder_init(config, &codecWidth, &codecHeight, &bandwidth, &fps, 1);
-	// start vide thread
+	// start video thread
+	video_thread_is_running = true;
 	boost::thread videoThread(boost::bind(video_thread_fn, duration));
 }
 
 void stop_video()
 {
-	//TODO NOT IMPLEMENTED
+	BOOST_LOG_TRIVIAL(info) << " stoping video encoder" << std::endl;
+	video_thread_is_running = false;
 }
 
 void handle_incoming_message(Message* message)

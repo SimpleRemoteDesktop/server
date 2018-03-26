@@ -12,12 +12,13 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 void new_incoming_socket_handler(socket_ptr sock)
 {
 	boost::system::error_code error;
+	bool socket_running = true;
 	try
 	{
 		sock->set_option(tcp::no_delay(true));
 		char data[sizeof(Message)];
 		Message* m;
-		while(true)
+		while(socket_running)
 		{
 			size_t length = sock->read_some(buffer(data), error);
 			if (error == error::eof) {
@@ -27,10 +28,9 @@ void new_incoming_socket_handler(socket_ptr sock)
 			}
 			else if (error) {
 				std::cout << "network error send stop command" << std::endl;
-
 				throw boost::system::system_error(error); // Some other error.
 			}
-			std::cout << "receiving new message" << std::endl;
+			//std::cout << "receiving new message" << std::endl;
 			m = (Message*)data;
 			handle_incoming_message(m);
 		}
@@ -38,7 +38,8 @@ void new_incoming_socket_handler(socket_ptr sock)
 	}
 	catch (exception& e)
 	{
-		cerr << "Exception in thread: " << e.what() << "\n";
+	socket_running = false;
+	cerr << "Exception in thread: " << e.what() << "\n";
 
 	}
 
