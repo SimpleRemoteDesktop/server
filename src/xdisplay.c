@@ -13,11 +13,21 @@ extern "C" {
 	XColor color;
 	XImage * ximage = NULL;
 	static XShmSegmentInfo __xshminfo;
+	static int desktopWidth = 0;
+	static int desktopHeight = 0;
 
+	int handler(Display * d, XErrorEvent * e)
+	{
+		printf("Error code: %s", e->error_code);
+		return 0;
+
+	}
 
 	int SRD_X11_display_init(const char * displayname, Configuration* config) 
 	{
 		// init
+		XSetErrorHandler(handler);
+		XInitThreads();
 		int ignore = 0;
 		bzero(&__xshminfo, sizeof(__xshminfo));
 
@@ -44,8 +54,8 @@ extern "C" {
 			printf("cannot obtain screen #%d\n", screenNumber);
 		}
 		// get screen hight, width, depth
-		config->width = XDisplayWidth(display, screenNumber);
-		config->height = XDisplayHeight(display, screenNumber);
+		desktopWidth = config->width = XDisplayWidth(display, screenNumber); //TODO refactoring
+		desktopHeight =	config->height = XDisplayHeight(display, screenNumber); //TODO refactoring
 		int desktopDepth = XDisplayPlanes(display, screenNumber);
 		printf("X-Window-init: dimension: %dx%dx%d @ %d/%d\n",
 				config->width, config->height, desktopDepth, screenNumber, XScreenCount(display));
@@ -73,17 +83,19 @@ extern "C" {
 		}
 		//
 		rootWindow = XRootWindow(display, screenNumber);
-
 	}
 
 	void SRD_X11_display_image( Image *image, bool withPointer )
 	{
 
+		XLockDisplay(display);
 		if(XShmGetImage(display, rootWindow, ximage, 0, 0, XAllPlanes()) == 0) {
 			// image->data RGBA
 			printf("FATAL: XShmGetImage failed.\n");
 			exit(-1);
 		}
+		XUnlockDisplay(display);
+
 		image->width = ximage->width;
 		image->height = ximage->height;
 		memcpy(image->data, ximage->data, ximage->width * ximage->height * 4);
@@ -117,11 +129,14 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void SRD_X11_display_mouse_move( int x, int y )
+	void SRD_X11_display_mouse_move( float x, float y ) // TODO must be int => convertor
 	{
+		int a = (int) desktopWidth * x;
+		int b = (int) desktopHeight *y;
+		//printf("mouse x: %d, y: %d", a, b);
 		XLockDisplay(display);
 		XTestGrabControl(display, True);
-		XTestFakeMotionEvent(display, screenNumber, x, y, CurrentTime);
+		XTestFakeMotionEvent(display, screenNumber, a, b, CurrentTime);
 		XFlush(display);
 		XTestGrabControl(display, False);
 		XUnlockDisplay(display);
@@ -129,10 +144,10 @@ extern "C" {
 
 	void SRD_X11_display_mouse_button(int button, bool isDown ) 
 	{
-
+		printf("button %d, is down %b", button, isDown);
 		XLockDisplay(display);
 		XTestGrabControl(display, True);		
-		XTestFakeButtonEvent(display, button, isDown ? True : False, CurrentTime);
+		XTestFakeButtonEvent(display, button, isDown, CurrentTime);
 		XFlush(display);
 		XTestGrabControl(display, False);
 		XUnlockDisplay(display);

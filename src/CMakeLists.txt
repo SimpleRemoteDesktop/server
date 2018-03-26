@@ -4,7 +4,8 @@ file(GLOB SRC
 
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-find_package( Boost REQUIRED COMPONENTS thread  )
+ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
+find_package( Boost REQUIRED COMPONENTS thread log)
 find_package (Threads)
 find_package(X11)
 find_package(XTest)

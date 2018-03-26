@@ -59,13 +59,13 @@ extern "C" {
 		codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 		if (!codec) {
 			fprintf(stderr, "Codec not found\n");
-			exit(1);
+			return -1;
 		}
 
 		c = avcodec_alloc_context3(codec);
 		if (!c) {
 			fprintf(stderr, "Could not allocate video codec context\n");
-			exit(1);
+			return -1;
 		}
 
 		/* put sample parameters */
@@ -106,13 +106,13 @@ extern "C" {
 		/* open it */
 		if (avcodec_open2(c, codec, NULL) < 0) {
 			fprintf(stderr, "Could not open codec\n");
-			exit(1);
+			return -1;
 		}
 
 		frame = av_frame_alloc();
 		if (!frame) {
 			fprintf(stderr, "Could not allocate video frame\n");
-			exit(1);
+			return -1;
 		}
 		frame->format = c->pix_fmt;
 		frame->width  = c->width;
@@ -124,7 +124,7 @@ extern "C" {
 				c->pix_fmt, 32);
 		if (ret < 0) {
 			fprintf(stderr, "Could not allocate raw picture buffer\n");
-			exit(1);
+			return -1;
 		}
 
 
@@ -164,7 +164,7 @@ extern "C" {
 
 		if (got_output) {
 
-			fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
+			//fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
 			outputFrame->data = pkt.data;
 			outputFrame->size = pkt.size;
 		}

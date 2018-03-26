@@ -46,7 +46,7 @@ extern "C" {
 	void SRD_X11_display_image( Image *image, bool withPointer );
 	void SRD_X11_display_keypress_with_keycode( int keycode, bool isDown );
 	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown );
-	void SRD_X11_display_mouse_move( int x, int y );
+	void SRD_X11_display_mouse_move( float x, float y );
 	void SRD_X11_display_mouse_button(int button, bool isDown );
 	void SRD_X11_paint_mouse_pointer(Image *image);
 	void SRD_X11_display_close();

@@ -57,7 +57,8 @@ void socket_sender_thread_fn(socket_ptr sock)
 			memcpy(fullFrame, (void *) &counter, 4);
 			memcpy(fullFrame+4, (void *) &frame->size, 4);
 			memcpy(fullFrame+8, (void *) frame->data, frame->size);
-			boost::asio::write(*sock, buffer(fullFrame, sizeof(frame->size+8)));
+
+			boost::asio::write(*sock, buffer(fullFrame, frame->size+8));
 			counter++;
 		} else {
 			boost::this_thread::sleep(boost::posix_time::milliseconds(1));
