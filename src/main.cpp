@@ -12,7 +12,7 @@
 #include "network.hpp"
 #include "encoder_ffmpeg.h"
 #include "xdisplay.h"
-
+#include "keysym_converter.h"
 
 Configuration* config;
 Fifo<Frame> *queueToNetwork;
@@ -65,10 +65,10 @@ void handle_incoming_message(Message* message)
 
 	switch (message->type) {
 		case 1:
-			SRD_X11_display_keypress_with_keysym(message->keycode, True);
+			SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), True);
 			break;
 		case 2:
-			SRD_X11_display_keypress_with_keysym(message->keycode, False);
+			SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), False);
 			break;
 		case 3:
 			SRD_X11_display_mouse_move(message->x,message->y); 
@@ -104,6 +104,8 @@ int main(int argc, const char* argv[])
 	config = new Configuration();
 	queueToNetwork = new Fifo<Frame>();
 	queueFromNetwork = new Fifo<Message>();
+	// init keysym mapper
+	keysym_init();	
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();
