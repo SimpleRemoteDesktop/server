@@ -13,5 +13,6 @@ find_package(Xext)
 find_package(XFixes)
 find_package(FFmpeg)
 
-add_executable (SRDServer ${SRC})
-target_link_libraries( SRDServer ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
+add_subdirectory(input)
+add_executable (SRDServer ${SRC} )
+target_link_libraries( SRDServer input ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})

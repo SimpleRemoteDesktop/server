@@ -12,7 +12,7 @@
 #include "network.hpp"
 #include "encoder_ffmpeg.h"
 #include "xdisplay.h"
-#include "keysym_converter.h"
+#include "input/SD2_X11_keysym_converter.h"
 
 Configuration* config;
 Fifo<Frame> *queueToNetwork;

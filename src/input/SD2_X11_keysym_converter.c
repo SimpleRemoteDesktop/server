@@ -1,4 +1,4 @@
-#include "keysym_converter.h"
+#include "SD2_X11_keysym_converter.h"
 
 #ifdef __cplusplus
 extern "C" {
