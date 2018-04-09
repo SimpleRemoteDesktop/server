@@ -144,7 +144,7 @@ extern "C" {
 
 	void SRD_X11_display_mouse_button(int button, bool isDown ) 
 	{
-		printf("button %d, is down %b", button, isDown);
+		printf("button %d, is down %b\n", button, isDown);
 		XLockDisplay(display);
 		XTestGrabControl(display, True);		
 		XTestFakeButtonEvent(display, button, isDown, CurrentTime);

@@ -34,6 +34,8 @@ void video_thread_fn(float duration)
 		frame->size = 0;
 
 		encoder_encodeFrame(image, frame);
+		free(image->data);
+		free(image);
 		queueToNetwork->push(frame);
 
 		boost::posix_time::ptime t2 = boost::posix_time::microsec_clock::local_time(); 
