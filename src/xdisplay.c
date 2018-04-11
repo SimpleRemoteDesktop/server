@@ -26,7 +26,7 @@ extern "C" {
 	int SRD_X11_display_init(const char * displayname, Configuration* config) 
 	{
 		// init
-		XSetErrorHandler(handler);
+		//		XSetErrorHandler(handler);
 		XInitThreads();
 		int ignore = 0;
 		bzero(&__xshminfo, sizeof(__xshminfo));
@@ -120,13 +120,24 @@ extern "C" {
 
 	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown )
 	{
+		int keycode = XKeysymToKeycode(display, keysym);
+		if(keysym == XK_ISO_Level3_Shift)
+		{
+			keycode = 108; //FIXME workaround for alt gr key not correctly detected
+		}
+		if(keycode > 0) 
+		{
+			XLockDisplay(display);
+			XTestGrabControl(display, True);
+			XTestFakeKeyEvent(display, keycode, isDown, CurrentTime);
+			XFlush(display);
+			XTestGrabControl(display, False);
+			XUnlockDisplay(display);
 
-		XLockDisplay(display);
-		XTestGrabControl(display, True);
-		XTestFakeKeyEvent(display,XKeysymToKeycode(display, keysym),isDown, CurrentTime);
-		XFlush(display);
-		XTestGrabControl(display, False);
-		XUnlockDisplay(display);
+		} else {
+
+			fprintf(stderr, "invalide keycode : keysym %d, keycode %d \n", keysym, XKeysymToKeycode(display, keysym));
+		}
 	}
 
 	void SRD_X11_display_mouse_move( float x, float y ) // TODO must be int => convertor
