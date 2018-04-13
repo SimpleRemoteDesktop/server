@@ -1,6 +1,6 @@
 #include "network.hpp"
 #include "main.hpp"
-
+#include "NetworkAbstract.class.h"
 using namespace std;
 using namespace boost::asio;
 using ip::tcp;
