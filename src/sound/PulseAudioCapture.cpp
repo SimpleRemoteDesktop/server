@@ -18,8 +18,10 @@ PulseAudioCapture::PulseAudioCapture(int sampleRate, int channels) {
     pa_spec.rate = sampleRate; //48000
     pa_spec.format = PA_SAMPLE_S16LE;
 
-    pa_ctx = pa_simple_new(NULL, "Simple Remote desktop audio source", PA_STREAM_RECORD, dev, "srd record stream", &pa_spec, NULL, NULL, &error);
-
+    pa_ctx = pa_simple_new(NULL, "Simple Remote desktop audio source", PA_STREAM_RECORD, NULL /*dev*/, "srd record stream", &pa_spec, NULL, NULL, &error);
+    if(pa_ctx == NULL) {
+        fprintf(stderr, "audio source: pulseaudio initialization failed - %d:%s.\n", error, pa_strerror(error));
+    }
     pa_simple_get_latency(pa_ctx, &error);
     if(error)  {
         fprintf(stderr, " unable to retreive plusaudio latency \n %d \n %s \n", error,pa_strerror(error));
