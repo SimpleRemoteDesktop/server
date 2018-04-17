@@ -47,21 +47,18 @@ void new_incoming_socket_handler(socket_ptr sock)
 
 void socket_sender_thread_fn(socket_ptr sock)
 {
-	int counter = 1;
-
-	while(true) 
+	while(true)
 	{
 		Frame* frame = queueToNetwork->get();
 		if(frame) 
 		{
 			void* fullFrame = malloc(frame->size + 8);
-			memcpy(fullFrame, (void *) &counter, 4);
+			memcpy(fullFrame, (void *) &frame->type, 4);
 			memcpy(fullFrame+4, (void *) &frame->size, 4);
 			memcpy(fullFrame+8, (void *) frame->data, frame->size);
 
 			boost::asio::write(*sock, buffer(fullFrame, frame->size+8));
 			free(fullFrame);
-			counter++;
 		} else {
 			boost::this_thread::sleep(boost::posix_time::milliseconds(1));
 		}

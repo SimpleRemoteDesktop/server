@@ -3,6 +3,7 @@
 //
 
 #include "SoundManager.h"
+#include "../encoder_ffmpeg.h"
 
 
 void sound_capture_thread_fn(SoundManager* soundManager) { //TODO lambda
@@ -15,31 +16,36 @@ SoundManager::SoundManager(Fifo <Frame> outputQueue) {
     this->channels = 2;
     this->bitrate = 128000;
     this->pulse = new PulseAudioCapture(this->sampleRate, this->channels);
-    this->encoder = new OpusEncoder(this->sampleRate, this->channels, this->bitrate);
+    this->encoder = new OpusEncoderManager(this->sampleRate, this->channels, this->bitrate);
 }
 
 void SoundManager::start() {
+
+    fprintf(stdout, "sending start sound encoder:\n");
     boost::thread socketSendThread(boost::bind(sound_capture_thread_fn, this));
+
+
 }
 
 void SoundManager::capture() {
+//FIXME : pulseaudio return buffer
 
-    unsigned char* buffer = NULL;
-    Frame* frame = NULL;
-    int duration = 1 / this->sampleRate;
+    short buffer[64];
+    Frame* frame = (Frame*) malloc(sizeof(Frame));
     this->isRunning = true;
-    while(this->isRunning) {
-        boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time();
+    fprintf(stdout, "sound is running %d \n", this->isRunning);
+    while(this->isRunning) { //TODO buffering 1ms of sound
+        fprintf(stdout, "getting pulseaudio buffer\n");
         pulse->getBuffer(buffer);
-        encoder->encode((short*) buffer, frame);
+        fprintf(stdout, "encoding with lib opus\n");
+        for(int i= 0; i < 64; i++) {
+        encoder->encode(buffer[i], frame);
+        fprintf(stdout, "sending frame size : %d\n", frame->size);
         outputQueue.push(frame);
-        boost::posix_time::ptime t2 = boost::posix_time::microsec_clock::local_time();
-        boost::posix_time::time_duration diff = t2 - t1;
-        //BOOST_LOG_TRIVIAL(debug) << "encoder time : " << diff.total_milliseconds();
-
-        boost::this_thread::sleep(boost::posix_time::milliseconds(duration - diff.total_milliseconds()));
+        }
 
     }
+    fprintf(stdout, "sound loop exited");
 }
 
 

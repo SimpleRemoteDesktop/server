@@ -10,11 +10,14 @@ extern "C" {
 
 #include "xdisplay.h"
 #include "libavutil/pixfmt.h"
+#define VIDEO_FRAME 1
+#define AUDIO_FRAME 2
 
 	typedef	struct  
 	{
 		unsigned char * data;
 		unsigned long size;
+		int type;
 
 	} Frame;
 

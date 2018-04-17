@@ -7,7 +7,7 @@
 
 #include <boost/thread.hpp>
 #include "PulseAudioCapture.h"
-#include "OpusEncoder.h"
+#include "OpusEncoderManager.h"
 #include "../encoder_ffmpeg.h"
 #include "../fifo.hpp"
 
@@ -20,7 +20,7 @@ public:
 
 private:
     PulseAudioCapture *pulse;
-    OpusEncoder * encoder;
+    OpusEncoderManager * encoder;
     int sampleRate;
     int channels;
     int bitrate;

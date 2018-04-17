@@ -8,10 +8,10 @@
 #include <opus/opus.h>
 #include "../encoder_ffmpeg.h"
 
-class OpusEncoder {
+class OpusEncoderManager {
 public:
-    OpusEncoder(int sampleRate, int channels, int bitrate);
-    void encode(short *in, Frame* frame);
+    OpusEncoderManager(int sampleRate, int channels, int bitrate);
+    void encode(short in, Frame* frame);
 private:
     OpusEncoder *encoder;
 

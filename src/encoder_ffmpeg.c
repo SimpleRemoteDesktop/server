@@ -167,6 +167,7 @@ extern "C" {
 			//fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
 			outputFrame->data = pkt.data;
 			outputFrame->size = pkt.size;
+			outputFrame->type = VIDEO_FRAME;
 		}
 
 	}

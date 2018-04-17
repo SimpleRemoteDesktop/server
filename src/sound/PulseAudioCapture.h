@@ -12,13 +12,14 @@
 #include <iostream>
 
 #define	PULSEAUDIO_CHUNKSIZE	1024
+//#define	PULSEAUDIO_CHUNKSIZE	1024
 #define AUDIOBUF_BUFSIZE	16384
 
 class PulseAudioCapture {
 public:
     PulseAudioCapture(int sampleRate, int channels);
     ~PulseAudioCapture();
-    void getBuffer(unsigned char* buffer);
+    void getBuffer(short* buffer);
 
 private:
     const char *dev;

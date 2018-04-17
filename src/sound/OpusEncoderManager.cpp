@@ -3,13 +3,14 @@
 //
 
 #include <cstdio>
-#include "OpusEncoder.h"
+#include "OpusEncoderManager.h"
+#include "../encoder_ffmpeg.h"
 
 #define FRAME_SIZE 960
 #define MAX_PACKET_SIZE (3*1276)
 
 
-OpusEncoder::OpusEncoder(int sampleRate, int channels, int bitrate) {
+OpusEncoderManager::OpusEncoderManager(int sampleRate, int channels, int bitrate) {
 
 
     int nbBytes;
@@ -31,9 +32,10 @@ OpusEncoder::OpusEncoder(int sampleRate, int channels, int bitrate) {
 
 
 }
-void OpusEncoder::encode(short *in, Frame * frame) {
+void OpusEncoderManager::encode(short in, Frame * frame) {
     unsigned char* output;
-    int nbBytes = opus_encode(encoder, in, FRAME_SIZE, output, MAX_PACKET_SIZE);
+    int nbBytes = opus_encode(encoder, &in, FRAME_SIZE, output, MAX_PACKET_SIZE);
+    fprintf(stdout, "sound frame size : %d", nbBytes);
     if (nbBytes<0)
     {
         fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));
@@ -41,4 +43,5 @@ void OpusEncoder::encode(short *in, Frame * frame) {
     }
     frame->data = output;
     frame->size = nbBytes;
+    frame->type = AUDIO_FRAME;
 }
