@@ -12,7 +12,11 @@ find_package(XTest)
 find_package(Xext)
 find_package(XFixes)
 find_package(FFmpeg)
+find_package(Opus)
+find_package(PulseAudio)
+
 
 add_subdirectory(input)
+add_subdirectory(sound)
 add_executable (SRDServer ${SRC} )
-target_link_libraries( SRDServer input ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
+target_link_libraries( SRDServer input sound ${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})

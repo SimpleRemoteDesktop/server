@@ -5,6 +5,7 @@
 #include "network.hpp"
 #include "encoder_ffmpeg.h"
 #include "config.h"
+#include "sound/SoundManager.h"
 
 
 extern Fifo<Frame> *queueToNetwork;

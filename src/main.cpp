@@ -49,7 +49,7 @@ void video_thread_fn(float duration)
 
 void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sdl)
 {
-	const char* displayname = ":0";
+	const char* displayname = std::getenv("DISPLAY");
 	float duration = (float) 1000 / fps;
 	BOOST_LOG_TRIVIAL(info) << "fps : " << fps << ", duration " << duration;
 	SRD_X11_display_init(displayname, config);
@@ -63,6 +63,13 @@ void stop_video()
 {
 	BOOST_LOG_TRIVIAL(info) << " stoping video encoder" << std::endl;
 	video_thread_is_running = false;
+}
+
+
+void start_sound()
+{
+    SoundManager *soundManager = new SoundManager(*queueToNetwork);
+    soundManager->start();
 }
 
 void handle_incoming_message(Message* message)
@@ -87,6 +94,7 @@ void handle_incoming_message(Message* message)
 		case 6:
 			BOOST_LOG_TRIVIAL(info) << "receive start request";
 			start_video(message->codec_width, message->codec_height, message->bandwidth, message->fps, message->sdl);
+            start_sound();
 			break;
 		case 7:
 			stop_video();
