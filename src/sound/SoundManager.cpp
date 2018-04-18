@@ -32,15 +32,11 @@ void SoundManager::capture() {
     short buffer[64];
     Frame* frame = (Frame*) malloc(sizeof(Frame));
     this->isRunning = true;
-    fprintf(stdout, "sound is running %d \n", this->isRunning);
     while(this->isRunning) { //TODO buffering 1ms of sound
-        fprintf(stdout, "getting pulseaudio buffer\n");
         pulse->getBuffer(buffer);
-        fprintf(stdout, "encoding with lib opus\n");
         encoder->encode(buffer, frame);
-        fprintf(stdout, "sending frame size : %d\n", frame->size);
-
-            this->outputQueue.push(frame);
+        fprintf(stdout, "sending audio frame size : %d\n", frame->size);
+        this->outputQueue.push(frame);
     }
     fprintf(stdout, "sound loop exited");
 }

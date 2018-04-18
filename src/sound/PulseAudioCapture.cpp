@@ -26,7 +26,7 @@ PulseAudioCapture::PulseAudioCapture(int sampleRate, int channels) {
     }
     pa_simple_get_latency(pa_ctx, &error);
     if(error)  {
-        fprintf(stderr, " unable to retreive plusaudio latency \n %d \n %s \n", error,pa_strerror(error));
+        fprintf(stderr, " unable to retreive pulseaudio latency \n %d \n %s \n", error,pa_strerror(error));
     } else {
         fprintf(stdout, " plusaudio latency %dus \n", delay);
     }
@@ -34,6 +34,7 @@ PulseAudioCapture::PulseAudioCapture(int sampleRate, int channels) {
 }
 
 void PulseAudioCapture::getBuffer(short * buffer) {
+
 
     if(pa_simple_read(pa_ctx, buffer, PULSEAUDIO_CHUNKSIZE, &error) < 0) {
         fprintf(stderr, "pulseaudio read failed %d \n", error); //TODO throw error
