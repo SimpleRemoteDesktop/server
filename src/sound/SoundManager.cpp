@@ -29,7 +29,6 @@ void SoundManager::start() {
 
 void SoundManager::capture() {
 //FIXME : pulseaudio return buffer
-
     short buffer[64];
     Frame* frame = (Frame*) malloc(sizeof(Frame));
     this->isRunning = true;
@@ -38,12 +37,10 @@ void SoundManager::capture() {
         fprintf(stdout, "getting pulseaudio buffer\n");
         pulse->getBuffer(buffer);
         fprintf(stdout, "encoding with lib opus\n");
-        for(int i= 0; i < 64; i++) {
-        encoder->encode(buffer[i], frame);
+        encoder->encode(buffer, frame);
         fprintf(stdout, "sending frame size : %d\n", frame->size);
-        outputQueue.push(frame);
-        }
 
+            this->outputQueue.push(frame);
     }
     fprintf(stdout, "sound loop exited");
 }

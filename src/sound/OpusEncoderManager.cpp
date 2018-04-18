@@ -32,10 +32,9 @@ OpusEncoderManager::OpusEncoderManager(int sampleRate, int channels, int bitrate
 
 
 }
-void OpusEncoderManager::encode(short in, Frame * frame) {
+void OpusEncoderManager::encode(short *in, Frame * frame) {
     unsigned char* output;
-    int nbBytes = opus_encode(encoder, &in, FRAME_SIZE, output, MAX_PACKET_SIZE);
-    fprintf(stdout, "sound frame size : %d", nbBytes);
+    int nbBytes = opus_encode(encoder, in, FRAME_SIZE, output, MAX_PACKET_SIZE);
     if (nbBytes<0)
     {
         fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));
