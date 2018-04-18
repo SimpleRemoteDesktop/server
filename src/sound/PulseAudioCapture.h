@@ -7,7 +7,7 @@
 
 #include <pulse/simple.h>
 #include <pulse/error.h>
-#include <stdio.h>
+#include <cstdio>
 #include <unistd.h>
 #include <iostream>
 
@@ -19,12 +19,11 @@ class PulseAudioCapture {
 public:
     PulseAudioCapture(int sampleRate, int channels);
     ~PulseAudioCapture();
-    void getBuffer(short* buffer);
+    void getBuffer(unsigned char* buffer);
 
 private:
     const char *dev;
     pa_simple * pa_ctx = NULL;
-    pa_sample_spec pa_spec;
     int error;
 
 };

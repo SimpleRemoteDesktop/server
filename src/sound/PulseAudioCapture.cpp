@@ -8,6 +8,7 @@ using namespace std;
 
 
 PulseAudioCapture::PulseAudioCapture(int sampleRate, int channels) {
+    fprintf(stdout, "creating pulseaudio context");
     //dev = "auto_null.monitor";
     dev = "xrdp-sink.monitor";
     char pa_devname[64];
@@ -15,6 +16,7 @@ PulseAudioCapture::PulseAudioCapture(int sampleRate, int channels) {
 
     // TODO bitrate 128000
 
+    pa_sample_spec pa_spec;
     memset(&pa_spec, 0, sizeof(pa_spec));
     pa_spec.channels = channels; //2
     pa_spec.rate = sampleRate; //48000
@@ -33,15 +35,15 @@ PulseAudioCapture::PulseAudioCapture(int sampleRate, int channels) {
 
 }
 
-void PulseAudioCapture::getBuffer(short * buffer) {
+void PulseAudioCapture::getBuffer(unsigned char* buffer) {
 
-
-    if(pa_simple_read(pa_ctx, buffer, PULSEAUDIO_CHUNKSIZE, &error) < 0) {
+    if(pa_simple_read(pa_ctx, buffer, 1920, &error) < 0) { //FIXME size
         fprintf(stderr, "pulseaudio read failed %d \n", error); //TODO throw error
     }
 }
 
 PulseAudioCapture::~PulseAudioCapture() {
+    fprintf(stdout, "deleting pulseaudio context");
     if(pa_ctx != NULL)
         pa_simple_free(pa_ctx);
     pa_ctx = NULL;

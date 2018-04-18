@@ -13,10 +13,7 @@
 OpusEncoderManager::OpusEncoderManager(int sampleRate, int channels, int bitrate) {
 
 
-    int nbBytes;
     int err;
-    opus_int16 in[FRAME_SIZE*channels];
-    unsigned char cbits[MAX_PACKET_SIZE];
     encoder = opus_encoder_create(sampleRate, channels, OPUS_APPLICATION_AUDIO, &err);
     if (err<0)
     {
@@ -32,9 +29,9 @@ OpusEncoderManager::OpusEncoderManager(int sampleRate, int channels, int bitrate
 
 
 }
-void OpusEncoderManager::encode(short *in, Frame * frame) {
+void OpusEncoderManager::encode(unsigned char* in, Frame * frame) {
     unsigned char* output;
-    int nbBytes = opus_encode(encoder, in, FRAME_SIZE, output, MAX_PACKET_SIZE);
+    int nbBytes = opus_encode(encoder, (opus_int16*) in, FRAME_SIZE, output, MAX_PACKET_SIZE);
     if (nbBytes<0)
     {
         fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));

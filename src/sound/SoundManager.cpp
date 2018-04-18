@@ -29,14 +29,16 @@ void SoundManager::start() {
 
 void SoundManager::capture() {
 //FIXME : pulseaudio return buffer
-    short buffer[64];
     Frame* frame = (Frame*) malloc(sizeof(Frame));
     this->isRunning = true;
     while(this->isRunning) { //TODO buffering 1ms of sound
+        unsigned char* buffer = (unsigned char *) malloc(1920);
         pulse->getBuffer(buffer);
         encoder->encode(buffer, frame);
+        free(buffer);
         fprintf(stdout, "sending audio frame size : %d\n", frame->size);
         this->outputQueue.push(frame);
+
     }
     fprintf(stdout, "sound loop exited");
 }
