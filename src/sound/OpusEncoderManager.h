@@ -11,7 +11,7 @@
 class OpusEncoderManager {
 public:
     OpusEncoderManager(int sampleRate, int channels, int bitrate);
-    void encode(unsigned char * in, Frame* frame);
+    void encode(unsigned char *in, Frame *frame, size_t size);
 private:
     OpusEncoder *encoder;
 

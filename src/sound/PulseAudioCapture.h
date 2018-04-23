@@ -18,14 +18,18 @@
 class PulseAudioCapture {
 public:
     PulseAudioCapture(int sampleRate, int channels);
+
     ~PulseAudioCapture();
-    void getBuffer(unsigned char* buffer);
+    void getBuffer(unsigned char* buffer, size_t size);
+    //void grab();
 
 private:
+    pa_sample_spec pa_spec;
     const char *dev;
     pa_simple * pa_ctx = NULL;
     int error;
 
+    void grab();
 };
 
 

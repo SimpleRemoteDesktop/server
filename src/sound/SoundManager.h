@@ -11,6 +11,12 @@
 #include "../encoder_ffmpeg.h"
 #include "../fifo.hpp"
 
+
+struct AudioPcm {
+    unsigned char * data;
+    int length;
+};
+
 class SoundManager {
 public:
     SoundManager(Fifo<Frame> outputQueue);
@@ -26,6 +32,7 @@ private:
     int bitrate;
     bool isRunning = false;
     Fifo<Frame> outputQueue;
+    Fifo<AudioPcm> *rawFifo;
 };
 
 #endif //SIMPLEREMOTEDESKTOP_SERVER_SOUNDMANAGER_H

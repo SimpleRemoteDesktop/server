@@ -29,9 +29,9 @@ OpusEncoderManager::OpusEncoderManager(int sampleRate, int channels, int bitrate
 
 
 }
-void OpusEncoderManager::encode(unsigned char* in, Frame * frame) {
+void OpusEncoderManager::encode(unsigned char *in, Frame *frame, size_t size) {
     unsigned char* output;
-    int nbBytes = opus_encode(encoder, (opus_int16*) in, FRAME_SIZE, output, MAX_PACKET_SIZE);
+    int nbBytes = opus_encode(encoder, (opus_int16*) in, size, output, MAX_PACKET_SIZE);
     if (nbBytes<0)
     {
         fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));

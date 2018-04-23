@@ -11,6 +11,7 @@ void sound_capture_thread_fn(SoundManager* soundManager) { //TODO lambda
 }
 
 SoundManager::SoundManager(Fifo <Frame> outputQueue) {
+    this->rawFifo = new Fifo<AudioPcm>;
     this->outputQueue = outputQueue;
     this->sampleRate = 48000;
     this->channels = 2;
@@ -29,17 +30,21 @@ void SoundManager::start() {
 
 void SoundManager::capture() {
 //FIXME : pulseaudio return buffer
-    Frame* frame = (Frame*) malloc(sizeof(Frame));
+    Frame* audioFrame = (Frame*) malloc(sizeof(Frame));
+    size_t frame_sample_per_channel = this->sampleRate * 100 /* frame duration 2.5ms */ /10000LL;
+    size_t frame_size = this->channels * frame_sample_per_channel * sizeof(short);
+    fprintf(stdout, "frame_sample_per channel %d, frame size : %d \n", frame_sample_per_channel, frame_size);
+    boost::this_thread::sleep(boost::posix_time::milliseconds(10));
     this->isRunning = true;
-    while(this->isRunning) { //TODO buffering 1ms of sound
-        unsigned char* buffer = (unsigned char *) malloc(1920);
-        pulse->getBuffer(buffer);
-        encoder->encode(buffer, frame);
-        free(buffer);
-        fprintf(stdout, "sending audio frame size : %d\n", frame->size);
-        this->outputQueue.push(frame);
+    unsigned char* buffer = (unsigned char *) malloc(frame_size);
+    while(this->isRunning) {
+        pulse->getBuffer(buffer, frame_size);
+        encoder->encode(buffer, audioFrame, frame_sample_per_channel);
+        fprintf(stdout, "sending audio frame size : %d\n", audioFrame->size);
+        //this->outputQueue.push(frame);
 
     }
+    free(buffer);
     fprintf(stdout, "sound loop exited");
 }
 
