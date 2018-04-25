@@ -7,15 +7,14 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-
-#include "main.hpp"
 #include "network.hpp"
 #include "encoder_ffmpeg.h"
+#include "main.hpp"
 #include "xdisplay.h"
 #include "input/SD2_X11_keysym_converter.h"
 
 Configuration* config;
-Fifo<Frame> *queueToNetwork;
+Fifo<SRD_Buffer_Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
 
@@ -29,7 +28,7 @@ void video_thread_fn(float duration)
 		image->data = (char*) malloc(sizeof(char)*config->width*config->height*4);	
 		SRD_X11_display_image(image, false);
 
-		Frame* frame = new Frame();
+		SRD_Buffer_Frame* frame = new SRD_Buffer_Frame();
 		frame->data = NULL;
 		frame->size = 0;
 
@@ -115,11 +114,10 @@ int main(int argc, const char* argv[])
 
 
 	config = new Configuration();
-	queueToNetwork = new Fifo<Frame>();
+	queueToNetwork = new Fifo<SRD_Buffer_Frame>();
 	queueFromNetwork = new Fifo<Message>();
 	// init keysym mapper
 	keysym_init();
-	start_sound();
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();

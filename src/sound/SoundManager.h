@@ -11,24 +11,18 @@
 #include <pulse/simple.h>
 #include <pulse/error.h>
 #include <unistd.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "../encoder_ffmpeg.h"
-/*struct Frame { //FIXME duplicate
-	unsigned char * data;
-	unsigned long size;
-	int type;
-
-};*/
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include "../config.h"
 
 class SoundManager {
 public:
-	SoundManager(Fifo<Frame> * outputqueue);
+	SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue);
 	void start();
 	void stop();
 	void capture();
-	Fifo<Frame> *outputqueue;
+	Fifo<SRD_Buffer_Frame> *outputqueue;
 
 private:
 

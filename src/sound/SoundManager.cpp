@@ -10,7 +10,7 @@ void sound_capture_thread_fn(SoundManager* soundManager) { //TODO lambda
     soundManager->capture();
 }
 
-SoundManager::SoundManager(Fifo<Frame> * outputqueue) {
+SoundManager::SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue) {
     fprintf(stdout, "creating pulseaudio context\n");
     this->outputqueue = outputqueue;
     pa_usec_t delay = 0;
@@ -67,27 +67,26 @@ void SoundManager::capture() {
     while(true) {
 
 
+        SRD_Buffer_Frame* srd_buffer_frame = new SRD_Buffer_Frame();
         unsigned char * buffer = (unsigned char*) malloc(1920);
         int err = pa_simple_read(pa_ctx, buffer, 1920, &error);
         if( err < 0) { //FIXME size
             fprintf(stderr, "pulseaudio read failed %d \n", error); //TODO throw error
         }
-        fprintf(stdout, "getting pulse audio buffer\n");
         unsigned char* output;
-        /*int nbBytes = opus_encode(encoder, (opus_int16*) buffer, 480, output, 1920);
+        int nbBytes = opus_encode(encoder, (opus_int16*) buffer, 480, output, 1920);
         if (nbBytes<0)
         {
             fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));
             //FIXME exit
         }
-        fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
-        Frame* frame = new Frame();
-        frame->size = nbBytes;
-        frame->data = output;
-        frame->type = AUDIO_FRAME;*/
+        //fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
+        srd_buffer_frame->size = nbBytes;
+        srd_buffer_frame->data = output;
+        srd_buffer_frame->type = SRD_AUDIO_FRAME;
         free(buffer);
 
-        //outputqueue->push(frame);
+        outputqueue->push(srd_buffer_frame);
     }
 }
 

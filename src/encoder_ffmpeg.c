@@ -142,7 +142,7 @@ extern "C" {
 				NULL
 				);
 	}
-	void encoder_encodeFrame(Image* image, Frame* outputFrame)
+	void encoder_encodeFrame(Image* image, SRD_Buffer_Frame* outputFrame)
 	{
 		av_init_packet(&pkt);
 		pkt.data = NULL;    // packet data will be allocated by the encoder

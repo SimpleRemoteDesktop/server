@@ -1,10 +1,36 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-	typedef struct  
+typedef struct {
+    unsigned char * data;
+    unsigned long size;
+    int type;
+
+} SRD_Buffer_Frame;
+
+typedef struct
+{
+	int type;
+	float x;
+	float y;
+	int button;
+	int keycode;
+	int codec_width;
+	int codec_height;
+	int bandwidth;
+	int fps;
+	int sdl;
+
+} Message;
+
+#define VIDEO_FRAME 1
+#define SRD_AUDIO_FRAME 2
+
+	typedef struct
 	{
 		int width;
 		int height;
