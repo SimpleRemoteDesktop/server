@@ -68,7 +68,7 @@ void stop_video()
 
 void start_sound()
 {
-    SoundManager *soundManager = new SoundManager(*queueToNetwork);
+    SoundManager *soundManager = new SoundManager(queueToNetwork);
     soundManager->start();
 }
 
@@ -118,7 +118,8 @@ int main(int argc, const char* argv[])
 	queueToNetwork = new Fifo<Frame>();
 	queueFromNetwork = new Fifo<Message>();
 	// init keysym mapper
-	keysym_init();	
+	keysym_init();
+	start_sound();
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();
