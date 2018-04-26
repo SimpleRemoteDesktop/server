@@ -49,7 +49,7 @@ void socket_sender_thread_fn(socket_ptr sock)
 {
 	while(true)
 	{
-		Frame* frame =NULL ;// queueToNetwork->get();
+		SRD_Buffer_Frame* frame =NULL ;// queueToNetwork->get();
 		if(frame) 
 		{
 			void* fullFrame = malloc(frame->size + 8);

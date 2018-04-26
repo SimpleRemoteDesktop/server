@@ -6,33 +6,29 @@
 #define SIMPLEREMOTEDESKTOP_SERVER_SOUNDMANAGER_H
 
 #include <boost/thread.hpp>
-#include "PulseAudioCapture.h"
-#include "OpusEncoderManager.h"
-#include "../encoder_ffmpeg.h"
 #include "../fifo.hpp"
-
-
-struct AudioPcm {
-    unsigned char * data;
-    int length;
-};
+#include <opus/opus.h>
+#include <pulse/simple.h>
+#include <pulse/error.h>
+#include <unistd.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include "../config.h"
 
 class SoundManager {
 public:
-    SoundManager(Fifo<Frame> outputQueue);
-    void start();
-    void stop();
-    void capture();
+	SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue);
+	void start();
+	void stop();
+	void capture();
+	Fifo<SRD_Buffer_Frame> *outputqueue;
 
 private:
-    PulseAudioCapture *pulse;
-    OpusEncoderManager * encoder;
-    int sampleRate;
-    int channels;
-    int bitrate;
-    bool isRunning = false;
-    Fifo<Frame> outputQueue;
-    Fifo<AudioPcm> *rawFifo;
+
+	pa_simple * pa_ctx = NULL;
+	OpusEncoder *encoder;
+	int error;
 };
 
 #endif //SIMPLEREMOTEDESKTOP_SERVER_SOUNDMANAGER_H
