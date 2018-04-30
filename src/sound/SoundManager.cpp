@@ -68,19 +68,19 @@ void SoundManager::capture() {
 
 
         SRD_Buffer_Frame* srd_buffer_frame = new SRD_Buffer_Frame();
-        unsigned char * buffer = (unsigned char*) malloc(1920);
-        int err = pa_simple_read(pa_ctx, buffer, 1920, &error);
+        unsigned char * buffer = (unsigned char*) malloc(3840);
+        int err = pa_simple_read(pa_ctx, buffer, 3840, &error);
         if( err < 0) { //FIXME size
             fprintf(stderr, "pulseaudio read failed %d \n", error); //TODO throw error
         }
         unsigned char* output;
-        int nbBytes = opus_encode(encoder, (opus_int16*) buffer, 480, output, 1920);
+        int nbBytes = opus_encode(encoder, (opus_int16*) buffer, 960, output, 3840*8);
         if (nbBytes<0)
         {
             fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));
             //FIXME exit
         }
-        //fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
+        fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
         srd_buffer_frame->size = nbBytes;
         srd_buffer_frame->data = output;
         srd_buffer_frame->type = SRD_AUDIO_FRAME;
