@@ -80,7 +80,7 @@ void SoundManager::capture() {
             fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));
             //FIXME exit
         }
-        fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
+        //fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
         srd_buffer_frame->size = nbBytes;
         srd_buffer_frame->data = output;
         srd_buffer_frame->type = SRD_AUDIO_FRAME;

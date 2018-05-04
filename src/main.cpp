@@ -109,7 +109,7 @@ int main(int argc, const char* argv[])
 {
 
 	boost::log::core::get()->set_filter (
-		 boost::log::trivial::severity >= boost::log::trivial::debug
+		 boost::log::trivial::severity >= boost::log::trivial::info
 			);
 
 
