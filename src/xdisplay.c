@@ -27,6 +27,7 @@ extern "C" {
 	{
 		// init
 		//		XSetErrorHandler(handler);
+
 		XInitThreads();
 		int ignore = 0;
 		bzero(&__xshminfo, sizeof(__xshminfo));

@@ -44,8 +44,9 @@ class Fifo
 	}
 	void push(T* val) {
 		Node *n = new Node();
+		n->next = nullptr;
 		n->x = val;
-
+        int count = 0;
 
 		if(head == nullptr)
 		{
@@ -53,6 +54,7 @@ class Fifo
 		} else {
 			Node* current = head;
 			while(current->next != nullptr) {
+                count++;
 				current = current->next;
 			}
 			current->next = n;

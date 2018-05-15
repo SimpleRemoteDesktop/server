@@ -7,15 +7,14 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-
-#include "main.hpp"
 #include "network.hpp"
 #include "encoder_ffmpeg.h"
+#include "main.hpp"
 #include "xdisplay.h"
 #include "input/SD2_X11_keysym_converter.h"
 
 Configuration* config;
-Fifo<Frame> *queueToNetwork;
+Fifo<SRD_Buffer_Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
 
@@ -29,7 +28,7 @@ void video_thread_fn(float duration)
 		image->data = (char*) malloc(sizeof(char)*config->width*config->height*4);	
 		SRD_X11_display_image(image, false);
 
-		Frame* frame = new Frame();
+		SRD_Buffer_Frame* frame = new SRD_Buffer_Frame();
 		frame->data = NULL;
 		frame->size = 0;
 
@@ -49,7 +48,7 @@ void video_thread_fn(float duration)
 
 void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sdl)
 {
-	const char* displayname = ":0";
+	const char* displayname = std::getenv("DISPLAY");
 	float duration = (float) 1000 / fps;
 	BOOST_LOG_TRIVIAL(info) << "fps : " << fps << ", duration " << duration;
 	SRD_X11_display_init(displayname, config);
@@ -65,6 +64,13 @@ void stop_video()
 	video_thread_is_running = false;
 }
 
+
+void start_sound()
+{
+    SoundManager *soundManager = new SoundManager(queueToNetwork);
+    soundManager->start();
+}
+
 void handle_incoming_message(Message* message)
 {
 
@@ -76,7 +82,7 @@ void handle_incoming_message(Message* message)
 			SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), False);
 			break;
 		case 3:
-			SRD_X11_display_mouse_move(message->x,message->y); 
+			SRD_X11_display_mouse_move(message->x,message->y);
 			break;
 		case 4:
 			SRD_X11_display_mouse_button(message->button, True);
@@ -87,6 +93,7 @@ void handle_incoming_message(Message* message)
 		case 6:
 			BOOST_LOG_TRIVIAL(info) << "receive start request";
 			start_video(message->codec_width, message->codec_height, message->bandwidth, message->fps, message->sdl);
+            start_sound();
 			break;
 		case 7:
 			stop_video();
@@ -102,15 +109,15 @@ int main(int argc, const char* argv[])
 {
 
 	boost::log::core::get()->set_filter (
-		 boost::log::trivial::severity >= boost::log::trivial::info	
+		 boost::log::trivial::severity >= boost::log::trivial::debug
 			);
 
 
 	config = new Configuration();
-	queueToNetwork = new Fifo<Frame>();
+	queueToNetwork = new Fifo<SRD_Buffer_Frame>();
 	queueFromNetwork = new Fifo<Message>();
 	// init keysym mapper
-	keysym_init();	
+	keysym_init();
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();
