@@ -23,7 +23,7 @@ extern "C" {
 #include <X11/extensions/XShm.h>
 #include <X11/extensions/Xfixes.h>
 #include <X11/extensions/XTest.h>
-
+#include <X11/keysym.h>
 
 #define FFMIN(a,b) ((a) > (b) ? (b) : (a))
 #define FFMAX(a,b) ((a) > (b) ? (a) : (b))

@@ -72,7 +72,8 @@ void keysym_init()
 	keysym_add(SDLK_LSHIFT, XK_Shift_L);
 	keysym_add(SDLK_RCTRL, XK_Control_R);
 	keysym_add(SDLK_LCTRL, XK_Control_L);
-	keysym_add(SDLK_RALT, XK_Alt_R);
+	//keysym_add(SDLK_RALT, XK_Alt_R);
+	keysym_add(SDLK_RALT, XK_ISO_Level3_Shift);
 	keysym_add(SDLK_LALT, XK_Alt_L);
 	keysym_add(SDLK_RMETA, XK_Meta_R);
 	keysym_add(SDLK_LMETA, XK_Meta_L);
