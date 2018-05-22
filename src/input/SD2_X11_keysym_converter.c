@@ -116,6 +116,7 @@ int get_keysym(int sdl)
 		}
 		current = current->next;
 	}
+	fprintf(stdout, "sdl key %d, x11 key : %d", sdl, current->keysym->keysym);
 	return current->keysym->keysym;
 }
 

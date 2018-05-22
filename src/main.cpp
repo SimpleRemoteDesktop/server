@@ -82,7 +82,7 @@ void handle_incoming_message(Message* message)
 			SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), False);
 			break;
 		case 3:
-			SRD_X11_display_mouse_move(message->x,message->y); 
+			SRD_X11_display_mouse_move(message->x,message->y);
 			break;
 		case 4:
 			SRD_X11_display_mouse_button(message->button, True);
@@ -109,7 +109,7 @@ int main(int argc, const char* argv[])
 {
 
 	boost::log::core::get()->set_filter (
-		 boost::log::trivial::severity >= boost::log::trivial::info	
+		 boost::log::trivial::severity >= boost::log::trivial::info
 			);
 
 
