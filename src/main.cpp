@@ -12,11 +12,15 @@
 #include "main.hpp"
 #include "xdisplay.h"
 #include "input/SD2_X11_keysym_converter.h"
+#include "input/SRD_Keyboard.h"
+#include "config.h"
 
 Configuration* config;
+SRD_Keyboard *kb;
 Fifo<SRD_Buffer_Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
+
 
 void video_thread_fn(float duration)
 {
@@ -76,10 +80,12 @@ void handle_incoming_message(Message* message)
 
 	switch (message->type) {
 		case 1:
-			SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), True);
+			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 1);
+			kb->press(message->keycode, 1);
 			break;
 		case 2:
-			SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), False);
+			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 0);
+            kb->press(message->keycode, 0);
 			break;
 		case 3:
 			SRD_X11_display_mouse_move(message->x,message->y);
@@ -117,7 +123,8 @@ int main(int argc, const char* argv[])
 	queueToNetwork = new Fifo<SRD_Buffer_Frame>();
 	queueFromNetwork = new Fifo<Message>();
 	// init keysym mapper
-	keysym_init();
+	//keysym_init();
+	kb = new SRD_Keyboard();
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();

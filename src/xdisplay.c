@@ -85,7 +85,7 @@ extern "C" {
 		rootWindow = XRootWindow(display, screenNumber);
 	}
 
-	void SRD_X11_display_image( Image *image, bool withPointer )
+	void SRD_X11_display_image( Image *image, int withPointer )
 	{
 
 		XLockDisplay(display);
@@ -108,7 +108,7 @@ extern "C" {
 		}
 
 	}
-	void SRD_X11_display_keypress_with_keycode( int keycode, bool isDown )
+	void SRD_X11_display_keypress_with_keycode( int keycode, int isDown )
 	{
 		XLockDisplay(display);
 		XTestGrabControl(display, True);
@@ -118,12 +118,12 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown )
+	void SRD_X11_display_keypress_with_keysym( int keysym, int isDown )
 	{
 
 		XLockDisplay(display);
 		XTestGrabControl(display, True);
-		XTestFakeKeyEvent(display,XKeysymToKeycode(display, keysym),isDown, CurrentTime);
+		XTestFakeKeyEvent(display,XKeysymToKeycode(display, keysym), isDown ? True : False, CurrentTime) ;//FIXME isdown
 		XFlush(display);
 		XTestGrabControl(display, False);
 		XUnlockDisplay(display);
@@ -142,12 +142,12 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void SRD_X11_display_mouse_button(int button, bool isDown ) 
+	void SRD_X11_display_mouse_button(int button, int isDown )
 	{
-		printf("button %d, is down %b\n", button, isDown);
+		printf("button %d, is down %d\n", button, isDown);
 		XLockDisplay(display);
-		XTestGrabControl(display, True);		
-		XTestFakeButtonEvent(display, button, isDown, CurrentTime);
+		XTestGrabControl(display, True);
+		XTestFakeButtonEvent(display, button, isDown ? True : False, CurrentTime);
 		XFlush(display);
 		XTestGrabControl(display, False);
 		XUnlockDisplay(display);

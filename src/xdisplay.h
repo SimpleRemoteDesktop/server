@@ -10,7 +10,6 @@ extern "C" {
 #endif
 #include <stdio.h>
 #include<stdint.h>
-#include <stdbool.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <sys/ipc.h>
@@ -43,11 +42,11 @@ extern "C" {
 	} Image;
 
 	int SRD_X11_display_init(const char * displayname, Configuration* config);
-	void SRD_X11_display_image( Image *image, bool withPointer );
-	void SRD_X11_display_keypress_with_keycode( int keycode, bool isDown );
-	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown );
+	void SRD_X11_display_image( Image *image, int withPointer );
+	void SRD_X11_display_keypress_with_keycode( int keycode, int isDown );
+	void SRD_X11_display_keypress_with_keysym( int keysym, int isDown );
 	void SRD_X11_display_mouse_move( float x, float y );
-	void SRD_X11_display_mouse_button(int button, bool isDown );
+	void SRD_X11_display_mouse_button(int button, int isDown );
 	void SRD_X11_paint_mouse_pointer(Image *image);
 	void SRD_X11_display_close();
 #ifdef __cplusplus
