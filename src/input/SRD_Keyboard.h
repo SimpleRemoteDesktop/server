@@ -16,12 +16,16 @@ public:
     int press(int keycode, int isDown);
 private:
     int initKeyMap();
+    int sendEventToKernel(int keycode, bool isDown);
     int keysym_add(int sdl, int key);
     int convertKey(int sdlKeycode);
     input_event event;
     std::map<int, int> keymap;
+    std::map<int, bool> keyStateregister;
     uinput_user_dev uidev;
     int fd;
+
+    bool stateAsChange(int keycode, bool isDown);
 };
 
 

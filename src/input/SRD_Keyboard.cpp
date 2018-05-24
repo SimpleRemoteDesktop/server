@@ -46,28 +46,10 @@ SRD_Keyboard::SRD_Keyboard() {
 
 
 int SRD_Keyboard::press(int keycode, int isDown) {
-    memset(&event, 0, sizeof(event));
-    gettimeofday(&event.time, NULL);
-
-    event.type = EV_KEY;
-    event.code = convertKey(keycode);
-    event.value = isDown ? 1 : 0;
-    fprintf(stdout, "sending keycode %d is down ? %d, sdlkeycode %d\n", event.code, event.value, keycode);
-    int ret = write(fd, &event, sizeof(event));
-    if(ret < 0)
-    {
-        fprintf(stderr, "error while sending event %d \n", ret);
+    if(stateAsChange(keycode, isDown)) {
+        sendEventToKernel(keycode, isDown);
     }
 
-    memset(&event, 0, sizeof(event));
-    event.type = EV_SYN;
-    event.code = SYN_REPORT;
-    event.value = 0;
-    ret = write(fd, &event, sizeof(event));
-    if(ret < 0)
-    {
-        fprintf(stderr, "error while sending END event %d \n", ret);
-    }
 }
 
 int SRD_Keyboard::initKeyMap() {
@@ -196,4 +178,37 @@ int SRD_Keyboard::convertKey(int sdlKeycode) {
 SRD_Keyboard::~SRD_Keyboard() {
     ioctl(fd, UI_DEV_DESTROY),
     close(fd);
+}
+
+int SRD_Keyboard::sendEventToKernel(int keycode, bool isDown) {
+ memset(&event, 0, sizeof(event));
+    gettimeofday(&event.time, NULL);
+
+    event.type = EV_KEY;
+    event.code = convertKey(keycode);
+    event.value = isDown ? 1 : 0;
+    fprintf(stdout, "sending keycode %d is down ? %d, sdlkeycode %d\n", event.code, event.value, keycode);
+    int ret = write(fd, &event, sizeof(event));
+    if(ret < 0)
+    {
+        fprintf(stderr, "error while sending event %d \n", ret);
+    }
+
+    memset(&event, 0, sizeof(event));
+    event.type = EV_SYN;
+    event.code = SYN_REPORT;
+    event.value = 0;
+    ret = write(fd, &event, sizeof(event));
+    if(ret < 0)
+    {
+        fprintf(stderr, "error while sending END event %d \n", ret);
+    }
+}
+
+bool SRD_Keyboard::stateAsChange(int keycode, bool isDown) {
+   if( keyStateregister[keycode] == 0 || keyStateregister[keycode] != isDown) {
+       keyStateregister[keycode] = isDown;
+       return true;
+   }
+   return false;
 }
