@@ -19,6 +19,7 @@ typedef struct
 	float y;
 	int button;
 	int keycode;
+	int scancode;
 	int codec_width;
 	int codec_height;
 	int bandwidth;

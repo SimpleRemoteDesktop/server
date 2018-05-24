@@ -81,11 +81,11 @@ void handle_incoming_message(Message* message)
 	switch (message->type) {
 		case 1:
 			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 1);
-			kb->press(message->keycode, 1);
+			kb->press(message->scancode, 1);
 			break;
 		case 2:
 			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 0);
-            kb->press(message->keycode, 0);
+            kb->press(message->scancode, 0);
 			break;
 		case 3:
 			SRD_X11_display_mouse_move(message->x,message->y);
