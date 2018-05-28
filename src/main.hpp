@@ -2,12 +2,12 @@
 #define MAIN_H
 
 #include "fifo.hpp"
-#include "network.hpp"
-#include "encoder_ffmpeg.h"
+
 #include "config.h"
+#include "sound/SoundManager.h"
 
 
-extern Fifo<Frame> *queueToNetwork;
+extern Fifo<SRD_Buffer_Frame> *queueToNetwork;
 extern Fifo<Message> *queueFromNetwork;
 
 

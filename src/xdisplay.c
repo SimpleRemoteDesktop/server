@@ -26,7 +26,11 @@ extern "C" {
 	int SRD_X11_display_init(const char * displayname, Configuration* config) 
 	{
 		// init
+<<<<<<< HEAD
 		//		XSetErrorHandler(handler);
+=======
+		//XSetErrorHandler(handler);
+>>>>>>> sound
 		XInitThreads();
 		int ignore = 0;
 		bzero(&__xshminfo, sizeof(__xshminfo));
@@ -85,7 +89,7 @@ extern "C" {
 		rootWindow = XRootWindow(display, screenNumber);
 	}
 
-	void SRD_X11_display_image( Image *image, bool withPointer )
+	void SRD_X11_display_image( Image *image, int withPointer )
 	{
 
 		XLockDisplay(display);
@@ -108,7 +112,7 @@ extern "C" {
 		}
 
 	}
-	void SRD_X11_display_keypress_with_keycode( int keycode, bool isDown )
+	void SRD_X11_display_keypress_with_keycode( int keycode, int isDown )
 	{
 		XLockDisplay(display);
 		XTestGrabControl(display, True);
@@ -118,7 +122,7 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void SRD_X11_display_keypress_with_keysym( int keysym, bool isDown )
+	void SRD_X11_display_keypress_with_keysym( int keysym, int isDown )
 	{
 		int keycode = XKeysymToKeycode(display, keysym);
 		if(keysym == XK_ISO_Level3_Shift)
@@ -134,10 +138,19 @@ extern "C" {
 			XTestGrabControl(display, False);
 			XUnlockDisplay(display);
 
+<<<<<<< HEAD
 		} else {
 
 			fprintf(stderr, "invalide keycode : keysym %d, keycode %d \n", keysym, XKeysymToKeycode(display, keysym));
 		}
+=======
+		XLockDisplay(display);
+		XTestGrabControl(display, True);
+		XTestFakeKeyEvent(display,XKeysymToKeycode(display, keysym), isDown ? True : False, CurrentTime) ;//FIXME isdown
+		XFlush(display);
+		XTestGrabControl(display, False);
+		XUnlockDisplay(display);
+>>>>>>> sound
 	}
 
 	void SRD_X11_display_mouse_move( float x, float y ) // TODO must be int => convertor
@@ -153,12 +166,12 @@ extern "C" {
 		XUnlockDisplay(display);
 	}
 
-	void SRD_X11_display_mouse_button(int button, bool isDown ) 
+	void SRD_X11_display_mouse_button(int button, int isDown )
 	{
-		printf("button %d, is down %b\n", button, isDown);
+		printf("button %d, is down %d\n", button, isDown);
 		XLockDisplay(display);
-		XTestGrabControl(display, True);		
-		XTestFakeButtonEvent(display, button, isDown, CurrentTime);
+		XTestGrabControl(display, True);
+		XTestFakeButtonEvent(display, button, isDown ? True : False, CurrentTime);
 		XFlush(display);
 		XTestGrabControl(display, False);
 		XUnlockDisplay(display);

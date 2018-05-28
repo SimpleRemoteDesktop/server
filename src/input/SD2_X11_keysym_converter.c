@@ -1,4 +1,4 @@
-#include "keysym_converter.h"
+#include "SD2_X11_keysym_converter.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,6 +117,7 @@ int get_keysym(int sdl)
 		}
 		current = current->next;
 	}
+	fprintf(stdout, "sdl key %d, x11 key : %d", sdl, current->keysym->keysym);
 	return current->keysym->keysym;
 }
 
