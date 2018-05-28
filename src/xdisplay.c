@@ -26,7 +26,7 @@ extern "C" {
 	int SRD_X11_display_init(const char * displayname, Configuration* config) 
 	{
 		// init
-	//XSetErrorHandler(handler);
+		//		XSetErrorHandler(handler);
 		XInitThreads();
 		int ignore = 0;
 		bzero(&__xshminfo, sizeof(__xshminfo));
