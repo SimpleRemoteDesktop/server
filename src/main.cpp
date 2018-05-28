@@ -77,7 +77,7 @@ void start_sound()
 
 void handle_incoming_message(Message* message)
 {
-
+	fprintf(stdout, "keycode %d, scancode %d \n", message->keycode, message->scancode);
 	switch (message->type) {
 		case 1:
 			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 1);
