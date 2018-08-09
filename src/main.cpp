@@ -47,7 +47,7 @@ void video_thread_fn(float duration)
 
 		boost::this_thread::sleep(boost::posix_time::milliseconds(duration - diff.total_milliseconds()));
 	} 
-	
+
 }
 
 void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sdl)
@@ -71,21 +71,23 @@ void stop_video()
 
 void start_sound()
 {
-    SoundManager *soundManager = new SoundManager(queueToNetwork);
-    soundManager->start();
+	SoundManager *soundManager = new SoundManager(queueToNetwork);
+	soundManager->start();
 }
 
 void handle_incoming_message(Message* message)
 {
-	fprintf(stdout, "keycode %d, scancode %d \n", message->keycode, message->scancode);
 	switch (message->type) {
 		case 1:
+
+			fprintf(stdout, "keycode %d, scancode %d \n", message->keycode, message->scancode);
 			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 1);
 			kb->press(message->scancode, 1);
 			break;
 		case 2:
 			//SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 0);
-            kb->press(message->scancode, 0);
+			fprintf(stdout, "keycode %d, scancode %d \n", message->keycode, message->scancode);
+			kb->press(message->scancode, 0);
 			break;
 		case 3:
 			SRD_X11_display_mouse_move(message->x,message->y);
@@ -98,8 +100,14 @@ void handle_incoming_message(Message* message)
 			break;
 		case 6:
 			BOOST_LOG_TRIVIAL(info) << "receive start request";
+			BOOST_LOG_TRIVIAL(info) << " codec width " << message->codec_width;
+			BOOST_LOG_TRIVIAL(info) << " codec height " << message->codec_height;
+			BOOST_LOG_TRIVIAL(info) << " codec bandwidth " << message->bandwidth;
+			BOOST_LOG_TRIVIAL(info) << " codec fps " << message->fps;
+			BOOST_LOG_TRIVIAL(info) << " use sdl" << message->sdl;
+
 			start_video(message->codec_width, message->codec_height, message->bandwidth, message->fps, message->sdl);
-            start_sound();
+			start_sound();
 			break;
 		case 7:
 			stop_video();
@@ -115,7 +123,7 @@ int main(int argc, const char* argv[])
 {
 
 	boost::log::core::get()->set_filter (
-		 boost::log::trivial::severity >= boost::log::trivial::info
+			boost::log::trivial::severity >= boost::log::trivial::info
 			);
 
 
