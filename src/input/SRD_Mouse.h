@@ -14,10 +14,14 @@
 #include <linux/uinput.h>
 
 class SRD_Mouse {
+public:
     SRD_Mouse();
     ~SRD_Mouse();
     int mouseMove(int x, int y);
-    int mouseButton();
+    int mouseButton(int button, int isDown);
+private:
+    struct input_event ev;
+    int fd;
 
 };
 

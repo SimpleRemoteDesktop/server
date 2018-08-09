@@ -15,8 +15,8 @@ typedef struct {
 typedef struct
 {
 	int type;
-	float x;
-	float y;
+	int x;
+	int y;
 	int button;
 	int keycode;
 	int scancode;

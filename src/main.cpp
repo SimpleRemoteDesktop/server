@@ -13,10 +13,12 @@
 #include "xdisplay.h"
 #include "input/SD2_X11_keysym_converter.h"
 #include "input/SRD_Keyboard.h"
+#include "input/SRD_Mouse.h"
 #include "config.h"
 
 Configuration* config;
 SRD_Keyboard *kb;
+SRD_Mouse *mouse;
 Fifo<SRD_Buffer_Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
@@ -30,7 +32,7 @@ void video_thread_fn(float duration)
 		boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time(); 
 		Image* image = ( Image*  )malloc(sizeof(Image));
 		image->data = (char*) malloc(sizeof(char)*config->width*config->height*4);	
-		SRD_X11_display_image(image, false);
+		SRD_X11_display_image(image, true);
 
 		SRD_Buffer_Frame* frame = new SRD_Buffer_Frame();
 		frame->data = NULL;
@@ -90,13 +92,19 @@ void handle_incoming_message(Message* message)
 			kb->press(message->scancode, 0);
 			break;
 		case 3:
-			SRD_X11_display_mouse_move(message->x,message->y);
+
+            BOOST_LOG_TRIVIAL(info) << "mouse move x :" << message->x << "y : "  << message->y;
+		    mouse->mouseMove(message->x, message->y);
+
+			//SRD_X11_display_mouse_move(message->x,message->y);
 			break;
 		case 4:
-			SRD_X11_display_mouse_button(message->button, True);
+		    mouse->mouseButton(message->button, 1);
+			//SRD_X11_display_mouse_button(message->button, True);
 			break;
 		case 5:
-			SRD_X11_display_mouse_button(message->button, False);
+		    mouse->mouseButton(message->button, 0);
+			//SRD_X11_display_mouse_button(message->button, False);
 			break;
 		case 6:
 			BOOST_LOG_TRIVIAL(info) << "receive start request";
@@ -133,6 +141,7 @@ int main(int argc, const char* argv[])
 	// init keysym mapper
 	//keysym_init();
 	kb = new SRD_Keyboard();
+	mouse = new SRD_Mouse();
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();
