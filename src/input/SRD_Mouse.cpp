@@ -7,7 +7,7 @@
 #include <boost/log/expressions.hpp>
 
 SRD_Mouse::SRD_Mouse() {
-	int fd;
+
 	struct uinput_user_dev uidev;
 
 	fd = open("/dev/input/uinput", O_WRONLY | O_NONBLOCK);
