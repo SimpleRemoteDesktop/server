@@ -3,7 +3,6 @@
 //
 
 #include "SoundManager.h"
-#include "../encoder_ffmpeg.h"
 
 
 void sound_capture_thread_fn(SoundManager* soundManager) { //TODO lambda

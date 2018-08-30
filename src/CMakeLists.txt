@@ -1,7 +1,7 @@
 file(GLOB SRC
 	*.cpp
 	*.c)
-
+set(CMAKE_VERBOSE_MAKEFILE  FALSE)
 set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
 ADD_DEFINITIONS(-DBOOST_LOG_DYN_LINK)
@@ -18,5 +18,10 @@ find_package(PulseAudio)
 
 add_subdirectory(input)
 add_subdirectory(sound)
+add_subdirectory(videoCapture)
+set(NVPIPE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+add_subdirectory(NvPipe)
+
 add_executable (SRDServer ${SRC} )
-target_link_libraries( SRDServer input sound ${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
+target_link_libraries( SRDServer input sound videoCapture videoGrab videoEncoder NvPipe
+        ${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})

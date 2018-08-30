@@ -1,80 +1,37 @@
-#include "encoder_ffmpeg.h"
+//
+// Created by sylvain on 20/08/18.
+//
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include "libavutil/opt.h"
-#include "libavcodec/avcodec.h"
-#include "libavutil/channel_layout.h"
-#include "libavutil/common.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/mathematics.h"
-#include "libavutil/pixfmt.h"
-#include "libavutil/samplefmt.h"
-#include <libswscale/swscale.h>
+#include "SoftwareEncoder.h"
 
-#include <stdint.h>
 
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
-#include <sys/ipc.h>
-#include <X11/X.h>
-#include <X11/Xlibint.h>
-#include <X11/Xproto.h>
-#include <X11/Xutil.h>
-#include <sys/shm.h>
-#include <X11/extensions/shape.h>
-#include <X11/extensions/XShm.h>
-#include <X11/extensions/Xfixes.h>
-
-	//FFMEG vars
-	AVCodec *codec;
-	AVCodecContext *c = NULL;
-	AVFrame *frame;
-	AVPacket pkt;
-	struct SwsContext *sws_ctx = NULL;
-	int i = 0; //frame counter
-
-	uint8_t *yuv[3];
-
-	struct DesktopDimension {
-		int width;
-		int height;
-	};
-	
-	struct DesktopDimension desktop;
-
-	void encoder_init(Configuration* config, int *frameWidth,int *frameHeight, int * bit_rate, int * fps, int pix_fmt_int )
-	{
-		
+SoftwareEncoder::SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth, int codecHeight, int bit_rate, int fps, int pix_fmt_int ) {
 		//FFMPEG CODEC INIT
 
 		avcodec_register_all();
-	
-		desktop.width = config->width;
-		desktop.height = config->height;
-		fprintf(stdout, "desktop width %i, height %i\n", desktop.width, desktop.height);	
+
+		this->width = imageWidth;
+		this->height = imageHeight;
+		fprintf(stdout, "desktop width %i, height %i\n", this->width, this->height);
 
 		/* find the mpeg1 video encoder */
 		codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 		if (!codec) {
 			fprintf(stderr, "Codec not found\n");
-			return -1;
 		}
 
 		c = avcodec_alloc_context3(codec);
 		if (!c) {
 			fprintf(stderr, "Could not allocate video codec context\n");
-			return -1;
 		}
 
 		/* put sample parameters */
-		c->bit_rate = *bit_rate;
+		c->bit_rate = bit_rate;
 		/* resolution must be a multiple of two */
-		c->width = *frameWidth;
-		c->height = *frameHeight;
+		c->width = codecWidth;
+		c->height = codecHeight;
 		/* frames per second */
-		c->time_base = (AVRational) {1, *fps};
+		c->time_base = (AVRational) {1, fps};
 		/* emit one intra frame every ten frames
 		 * check frame pict_type before passing frame
 		 * to encoder, if frame->pict_type is AV_PICTURE_TYPE_I
@@ -93,7 +50,7 @@ extern "C" {
     case 2:
       c->pix_fmt = AV_PIX_FMT_YUV444P;
       break;
-  } 
+  }
 
 		// ultrafast,superfast, veryfast, faster, fast, medium, slow, slower, veryslow
 		av_opt_set(c->priv_data, "preset", "ultrafast", 0);
@@ -106,13 +63,11 @@ extern "C" {
 		/* open it */
 		if (avcodec_open2(c, codec, NULL) < 0) {
 			fprintf(stderr, "Could not open codec\n");
-			return -1;
 		}
 
 		frame = av_frame_alloc();
 		if (!frame) {
 			fprintf(stderr, "Could not allocate video frame\n");
-			return -1;
 		}
 		frame->format = c->pix_fmt;
 		frame->width  = c->width;
@@ -124,15 +79,15 @@ extern "C" {
 				c->pix_fmt, 32);
 		if (ret < 0) {
 			fprintf(stderr, "Could not allocate raw picture buffer\n");
-			return -1;
 		}
 
 
 		// initialize SWS context for software scaling
 		sws_ctx = sws_getContext(
-				config->width,
-				config->height,
+				this->width,
+				this->height,
 				AV_PIX_FMT_BGRA,
+				//AV_PIX_FMT_RGBA, // framebuffer
 				c->width,
 				c->height,
 				AV_PIX_FMT_YUV420P,
@@ -141,17 +96,17 @@ extern "C" {
 				NULL,
 				NULL
 				);
-	}
-	void encoder_encodeFrame(Image* image, SRD_Buffer_Frame* outputFrame)
-	{
+}
+
+SRD_Buffer_Frame * SoftwareEncoder::encode(Image *image) {
 		av_init_packet(&pkt);
 		pkt.data = NULL;    // packet data will be allocated by the encoder
 		pkt.size = 0;
 		unsigned char* srcData[1] = {(unsigned char * ) image->data}; // convert to array of pointer for plane
 		//const int inLinesize[1] = { 4 * c->width }; // bpp
-		const int inLinesize[1] = { 4 * desktop.width }; // bpp
+		const int inLinesize[1] = { 4 * this->width }; // bpp
 		//sws_scale(sws_ctx, (uint8_t const * const *) srcData,	inLinesize, 0, c->height, frame->data, frame->linesize);
-		sws_scale(sws_ctx, (uint8_t const * const *) srcData, inLinesize, 0, desktop.height, frame->data, frame->linesize);
+		sws_scale(sws_ctx, (uint8_t const * const *) srcData, inLinesize, 0, this->height, frame->data, frame->linesize);
 		frame->pts = i;
 		i++;
 		/* encode the image */
@@ -165,17 +120,12 @@ extern "C" {
 		if (got_output) {
 
 			//fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
-			outputFrame->data = pkt.data;
-			outputFrame->size = pkt.size;
-			outputFrame->type = VIDEO_FRAME;
+            SRD_Buffer_Frame *encodedFrame = new SRD_Buffer_Frame;
+			encodedFrame->data = pkt.data;
+			encodedFrame->size = pkt.size;
+			encodedFrame->type = VIDEO_FRAME;
+
+			return encodedFrame;
 		}
 
-	}
-
-	void free_av_packet() {
-		av_free_packet(&pkt);
-	}
-
-#ifdef __cplusplus
 }
-#endif
