@@ -8,13 +8,13 @@
 #include <boost/log/expressions.hpp>
 
 #include "network.hpp"
-#include "encoder_ffmpeg.h"
 #include "main.hpp"
-#include "xdisplay.h"
 #include "input/SD2_X11_keysym_converter.h"
 #include "input/SRD_Keyboard.h"
 #include "input/SRD_Mouse.h"
 #include "config.h"
+#include "videoCapture/VideoCapture.h"
+#include "input/X11FakeInput.h"
 
 Configuration* config;
 SRD_Keyboard *kb;
@@ -22,38 +22,18 @@ SRD_Mouse *mouse;
 Fifo<SRD_Buffer_Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
+FrameBufferGrab* fbgrab;
+X11FakeInput* x11input;
+bool withNvEnc = false;
 
 
-void video_thread_fn(float duration)
-{
-	BOOST_LOG_TRIVIAL(info) << "Starting new video thread with loop duration : " << duration << " ms";
-	while(video_thread_is_running)
-	{
-		boost::posix_time::ptime t1 = boost::posix_time::microsec_clock::local_time(); 
-		Image* image = ( Image*  )malloc(sizeof(Image));
-		image->data = (char*) malloc(sizeof(char)*config->width*config->height*4);	
-		SRD_X11_display_image(image, true);
-
-		SRD_Buffer_Frame* frame = new SRD_Buffer_Frame();
-		frame->data = NULL;
-		frame->size = 0;
-
-		encoder_encodeFrame(image, frame);
-		free(image->data);
-		free(image);
-		queueToNetwork->push(frame);
-
-		boost::posix_time::ptime t2 = boost::posix_time::microsec_clock::local_time(); 
-		boost::posix_time::time_duration diff = t2 - t1;
-		BOOST_LOG_TRIVIAL(debug) << "encoder time : " << diff.total_milliseconds();
-
-		boost::this_thread::sleep(boost::posix_time::milliseconds(duration - diff.total_milliseconds()));
-	} 
-
-}
 
 void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sdl)
 {
+	VideoCapture *vc = new VideoCapture(codecWidth, codecHeight, bandwidth, fps, queueToNetwork, withNvEnc);
+	vc->start();
+
+    /*fbgrab = new FrameBufferGrab();
 	const char* displayname = std::getenv("DISPLAY");
 	float duration = (float) 1000 / fps;
 	BOOST_LOG_TRIVIAL(info) << "fps : " << fps << ", duration " << duration;
@@ -61,7 +41,7 @@ void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sd
 	encoder_init(config, &codecWidth, &codecHeight, &bandwidth, &fps, 1);
 	// start video thread
 	video_thread_is_running = true;
-	boost::thread videoThread(boost::bind(video_thread_fn, duration));
+	boost::thread videoThread(boost::bind(video_thread_fn, duration));*/
 }
 
 void stop_video()
@@ -92,19 +72,13 @@ void handle_incoming_message(Message* message)
 			kb->press(message->scancode, 0);
 			break;
 		case 3:
-
-            BOOST_LOG_TRIVIAL(info) << "mouse move x :" << message->x << "y : "  << message->y;
-		    mouse->mouseMove(message->x, message->y);
-
-			//SRD_X11_display_mouse_move(message->x,message->y);
+			x11input->mouseMove(message->x, message->y);
 			break;
 		case 4:
-		    mouse->mouseButton(message->button, 1);
-			//SRD_X11_display_mouse_button(message->button, True);
+			x11input->mouseBtton(message->button, True);
 			break;
 		case 5:
-		    mouse->mouseButton(message->button, 0);
-			//SRD_X11_display_mouse_button(message->button, False);
+			x11input->mouseBtton(message->button, False);
 			break;
 		case 6:
 			BOOST_LOG_TRIVIAL(info) << "receive start request";
@@ -131,15 +105,23 @@ int main(int argc, const char* argv[])
 {
 
 	boost::log::core::get()->set_filter (
-			boost::log::trivial::severity >= boost::log::trivial::info
+			boost::log::trivial::severity >= boost::log::trivial::debug
 			);
 
+
+	if(argc == 2) {
+		std::string key = argv[1];
+		if(key.compare("+nvenc") == 0) {
+			withNvEnc = true;
+		}
+	}
 
 	config = new Configuration();
 	queueToNetwork = new Fifo<SRD_Buffer_Frame>();
 	queueFromNetwork = new Fifo<Message>();
 	// init keysym mapper
 	//keysym_init();
+	x11input = new X11FakeInput(":0");
 	kb = new SRD_Keyboard();
 	mouse = new SRD_Mouse();
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";

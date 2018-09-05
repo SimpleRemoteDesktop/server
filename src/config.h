@@ -7,7 +7,7 @@ extern "C" {
 #endif
 typedef struct {
     unsigned char * data;
-    unsigned long size;
+    unsigned long int size;
     int type;
 
 } SRD_Buffer_Frame;
