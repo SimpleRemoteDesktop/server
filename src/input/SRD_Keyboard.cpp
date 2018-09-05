@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 SRD_Keyboard::SRD_Keyboard() {
     fd = open("/dev/uinput", O_WRONLY | O_NONBLOCK | O_CREAT);
@@ -29,16 +31,16 @@ SRD_Keyboard::SRD_Keyboard() {
     int ret = write(fd, &uidev, sizeof(uidev));
     if (ret < 0)
     {
-        fprintf(stderr, "error while sending device  event %d\n", ret);
+        BOOST_LOG_TRIVIAL(error) << "error while sending device  event " << ret;
     }
 
     ret = ioctl(fd, UI_DEV_CREATE);
     if(ret < 0)
     {
-        fprintf(stderr, "error while creating device %d\n", ret);
+        BOOST_LOG_TRIVIAL(error) << "error while creating device " << ret;
     }
     sleep(1);
-    fprintf(stdout, "new keyboard device created\n");
+    BOOST_LOG_TRIVIAL(info) << "new keyboard device created";
 
     initKeyMap();
 }
@@ -187,11 +189,11 @@ int SRD_Keyboard::sendEventToKernel(int keycode, bool isDown) {
     event.type = EV_KEY;
     event.code = convertKey(keycode);
     event.value = isDown ? 1 : 0;
-    fprintf(stdout, "sending keycode %d is down ? %d, sdlkeycode %d\n", event.code, event.value, keycode);
+    BOOST_LOG_TRIVIAL(debug) << "sending keycode " << event.code << " is down ? " << event.value << ", sdlkeycode " << keycode;
     int ret = write(fd, &event, sizeof(event));
     if(ret < 0)
     {
-        fprintf(stderr, "error while sending event %d \n", ret);
+        BOOST_LOG_TRIVIAL(error) << "error while sending event " << ret;
     }
 
     memset(&event, 0, sizeof(event));
@@ -201,7 +203,7 @@ int SRD_Keyboard::sendEventToKernel(int keycode, bool isDown) {
     ret = write(fd, &event, sizeof(event));
     if(ret < 0)
     {
-        fprintf(stderr, "error while sending END event %d \n", ret);
+        BOOST_LOG_TRIVIAL(error) << "error while sending END event " << ret;
     }
 }
 

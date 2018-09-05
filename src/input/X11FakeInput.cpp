@@ -7,6 +7,8 @@
 #include <cstdlib>
 #include "X11FakeInput.h"
 #include "../config.h"
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 X11FakeInput::X11FakeInput(const char* displayName) {
 		XInitThreads();
@@ -19,20 +21,20 @@ X11FakeInput::X11FakeInput(const char* displayName) {
 
 		// open display
 		if((display = XOpenDisplay(this->displayName)) == NULL) {
-			printf("cannot open display \"%s\"\n", this->displayName ? this->displayName : "DEFAULT");
+			BOOST_LOG_TRIVIAL(error) << "cannot open display " << this->displayName;
 		}
 
 		// get default screen
 		this->screenNumber = XDefaultScreen(display);
 		if((this->screen = XScreenOfDisplay(display, screenNumber)) == NULL) {
-			printf("cannot obtain screen #%d\n", screenNumber);
+			BOOST_LOG_TRIVIAL(error) << "cannot obtain screen #" << this->screenNumber;
 		}
 		// get screen hight, width, depth
 		this->width = XDisplayWidth(display, screenNumber); //TODO refactoring
 		this->height = XDisplayHeight(display, screenNumber); //TODO refactoring
 		int desktopDepth = XDisplayPlanes(display, screenNumber);
-		printf("X-Window-init: dimension: %dx%dx%d @ %d/%d\n",
-				this->width, this->height, desktopDepth, screenNumber, XScreenCount(display));
+		BOOST_LOG_TRIVIAL(info) << "X-Window-init: dimension: " << this->width << "x" << this->height << "x"
+		<< "@" << desktopDepth <<  "/" << this->screenNumber;
 
 }
 
@@ -72,7 +74,7 @@ void X11FakeInput::mouseMove( float x, float y ) // TODO must be int => converto
 
 void X11FakeInput::mouseBtton(int button, int isDown )
 {
-    printf("button %d, is down %d\n", button, isDown);
+    BOOST_LOG_TRIVIAL(debug) << "button " << button << ", is down " << isDown;
     XLockDisplay(display);
     XTestGrabControl(display, True);
     XTestFakeButtonEvent(display, button, isDown ? True : False, CurrentTime);

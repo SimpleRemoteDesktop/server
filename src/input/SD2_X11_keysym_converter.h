@@ -27,7 +27,7 @@ extern "C" {
 
 	typedef struct SDL_X11_KeySym SDL_X11_KeySym;
 
-	struct SDL_X11_KeySym 
+	struct SDL_X11_KeySym
 	{
 		int sdl;
 		int keysym;
@@ -39,7 +39,7 @@ extern "C" {
 	struct KeySymElement
 	{
 		SDL_X11_KeySym* keysym;
-		KeySymElement* next;	
+		KeySymElement* next;
 	};
 
 	KeySymElement* keysym_first;
