@@ -3,26 +3,28 @@
 //
 
 #include "SoftwareEncoder.h"
-
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 SoftwareEncoder::SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth, int codecHeight, int bit_rate, int fps, int pix_fmt_int ) {
+	BOOST_LOG_TRIVIAL(info) << "using Software x264 encoder";
 		//FFMPEG CODEC INIT
 
 		avcodec_register_all();
 
 		this->width = imageWidth;
 		this->height = imageHeight;
-		fprintf(stdout, "desktop width %i, height %i\n", this->width, this->height);
+		 BOOST_LOG_TRIVIAL(info) << "desktop width : " <<  this->width << " height : " << this->height;
 
 		/* find the mpeg1 video encoder */
 		codec = avcodec_find_encoder(AV_CODEC_ID_H264);
 		if (!codec) {
-			fprintf(stderr, "Codec not found\n");
+			BOOST_LOG_TRIVIAL(info) << "Codec not found\n";
 		}
 
 		c = avcodec_alloc_context3(codec);
 		if (!c) {
-			fprintf(stderr, "Could not allocate video codec context\n");
+			BOOST_LOG_TRIVIAL(info) << "Could not allocate video codec context\n";
 		}
 
 		/* put sample parameters */
@@ -62,12 +64,12 @@ SoftwareEncoder::SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth
 		av_opt_set(c->priv_data, "x264opts", "no-mbtree:sliced-threads:sync-lookahead=0", 0);
 		/* open it */
 		if (avcodec_open2(c, codec, NULL) < 0) {
-			fprintf(stderr, "Could not open codec\n");
+			BOOST_LOG_TRIVIAL(info) << "Could not open codec\n";
 		}
 
 		frame = av_frame_alloc();
 		if (!frame) {
-			fprintf(stderr, "Could not allocate video frame\n");
+			BOOST_LOG_TRIVIAL(info) << "Could not allocate video frame\n";
 		}
 		frame->format = c->pix_fmt;
 		frame->width  = c->width;
@@ -78,7 +80,7 @@ SoftwareEncoder::SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth
 		int ret = av_image_alloc(frame->data, frame->linesize, c->width, c->height,
 				c->pix_fmt, 32);
 		if (ret < 0) {
-			fprintf(stderr, "Could not allocate raw picture buffer\n");
+			BOOST_LOG_TRIVIAL(info) << "Could not allocate raw picture buffer\n";
 		}
 
 
@@ -113,13 +115,12 @@ SRD_Buffer_Frame * SoftwareEncoder::encode(Image *image) {
 		int got_output;
 		int ret = avcodec_encode_video2(c, &pkt, frame, &got_output);
 		if (ret < 0) {
-			fprintf(stderr, "Error encoding frame\n");
+			BOOST_LOG_TRIVIAL(info) <<"Error encoding frame\n";
 			exit(1);
 		}
 
 		if (got_output) {
 
-			//fprintf(stdout, "Write frame (size=%5d)\n", pkt.size);
             SRD_Buffer_Frame *encodedFrame = new SRD_Buffer_Frame;
 			encodedFrame->data = pkt.data;
 			encodedFrame->size = pkt.size;

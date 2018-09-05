@@ -8,20 +8,24 @@ void videoCapture_running_thread_fn(VideoCapture* videoCapture) {
     videoCapture->capture();
 }
 
-VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork) {
+VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc) {
 
     this->outputQueue = queueToNetwork;
     this->codecWidth = codecWidth;
     this->codecHeight = codecHeight;
     this->bit_rate = bit_rate;
     this->fps = fps;
+    this->withNvEnc = withNvEnc;
 
     this->duration = (float) 1000 / this->fps;
 
     //this->grab = new FrameBufferGrab();
     this->grab = new X11Grab();
-    this->encoder  = new NVENC_Encoder(this->grab->width, this->grab->height, this->bit_rate, this->fps);
-    //this->encoder = new SoftwareEncoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps, 1);
+    if(this->withNvEnc) {
+        this->encoder  = new NVENC_Encoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps);
+    } else {
+        this->encoder = new SoftwareEncoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps, 1);
+    }
 
 }
 

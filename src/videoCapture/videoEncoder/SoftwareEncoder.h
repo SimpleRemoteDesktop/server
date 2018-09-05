@@ -19,9 +19,10 @@ extern "C" {
 
 #include "../../Image.h"
 #include "../../config.h"
+#include "AbstractEncoder.h"
 
 
-class SoftwareEncoder {
+class SoftwareEncoder: public AbstractEncoder {
 public:
     SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth, int codecHeight, int bit_rate, int fps, int pix_fmt_int );
     ~SoftwareEncoder();

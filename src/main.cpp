@@ -22,12 +22,13 @@ Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
 FrameBufferGrab* fbgrab;
 X11FakeInput* x11input;
+bool withNvEnc = false;
 
 
 
 void start_video(int codecWidth, int codecHeight, int bandwidth, int fps, int sdl)
 {
-	VideoCapture *vc = new VideoCapture(codecWidth, codecHeight, bandwidth, fps, queueToNetwork);
+	VideoCapture *vc = new VideoCapture(codecWidth, codecHeight, bandwidth, fps, queueToNetwork, withNvEnc);
 	vc->start();
 
     /*fbgrab = new FrameBufferGrab();
@@ -105,6 +106,13 @@ int main(int argc, const char* argv[])
 			boost::log::trivial::severity >= boost::log::trivial::debug
 			);
 
+
+	if(argc == 2) {
+		std::string key = argv[1];
+		if(key.compare("+nvenc") == 0) {
+			withNvEnc = true;
+		}
+	}
 
 	config = new Configuration();
 	queueToNetwork = new Fifo<SRD_Buffer_Frame>();

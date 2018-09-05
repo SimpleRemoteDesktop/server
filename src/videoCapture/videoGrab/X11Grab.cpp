@@ -76,7 +76,6 @@ X11Grab::X11Grab() {
 
 Image* X11Grab::read() {
 
-	printf("screen capture X11 windows");
 	XLockDisplay(display);
 	if(XShmGetImage(display, rootWindow, ximage, 0, 0, XAllPlanes()) == 0) {
 		// image->data  BGRA

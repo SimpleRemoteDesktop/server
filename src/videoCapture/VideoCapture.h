@@ -17,7 +17,7 @@
 
 class VideoCapture {
 public:
-    VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork);
+    VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc);
     ~VideoCapture();
     void start();
     void stop();
@@ -27,7 +27,7 @@ public:
 private:
     X11Grab *grab;
     //SoftwareEncoder *encoder;
-    NVENC_Encoder* encoder;
+    AbstractEncoder* encoder;
     int codecWidth;
     int codecHeight;
     int bit_rate;
@@ -35,6 +35,7 @@ private:
     float duration;
     bool isRunningThread = false;
     Fifo<SRD_Buffer_Frame> *outputQueue;
+    bool withNvEnc;
 };
 
 
