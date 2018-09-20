@@ -25,7 +25,7 @@ public:
 
 private:
     XShmSegmentInfo xshminfo;
-    Display *display = NULL;
+    Display *captureDisplay = NULL;
     char const * displayName;
     int screenNumber;
     Screen *screen;

@@ -15,9 +15,11 @@ public:
     void keypress_with_keysym( int keysym, int isDown );
     void mouseMove( float x, float y );
     void mouseBtton(int button, int isDown );
+    int getWidth();
+    int getHeight();
 
 private:
-    Display *display = NULL;
+    Display *display;
 
     int width;
     int height;

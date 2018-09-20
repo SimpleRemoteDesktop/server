@@ -16,13 +16,15 @@
 
 class SRD_Touchscreen {
 public:
-    SRD_Touchscreen();
+    SRD_Touchscreen(int desktopWidth, int desktopHeight);
     ~SRD_Touchscreen();
-    int mouseMove(int x, int y);
+    int mouseMove(float fx, float fy);
     int mouseButton(int button, int isDown);
 private:
     struct input_event ev;
     int fd;
+    int width;
+    int height;
 };
 
 
