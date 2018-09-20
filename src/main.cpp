@@ -15,10 +15,11 @@
 #include "config.h"
 #include "videoCapture/VideoCapture.h"
 #include "input/X11FakeInput.h"
-
+#include "input/SRD_Touchscreen.h";
 Configuration* config;
 SRD_Keyboard *kb;
 SRD_Mouse *mouse;
+SRD_Touchscreen* touchscreen;
 Fifo<SRD_Buffer_Frame> *queueToNetwork;
 Fifo<Message> *queueFromNetwork;
 bool video_thread_is_running = false;
@@ -72,13 +73,16 @@ void handle_incoming_message(Message* message)
 			kb->press(message->scancode, 0);
 			break;
 		case 3:
-			x11input->mouseMove(message->x, message->y);
+			//x11input->mouseMove(message->x, message->y);
+			touchscreen->mouseMove(message->x, message->y);
 			break;
 		case 4:
-			x11input->mouseBtton(message->button, True);
+			//x11input->mouseBtton(message->button, True);
+			touchscreen->mouseButton(message->button, True);
 			break;
 		case 5:
-			x11input->mouseBtton(message->button, False);
+			//x11input->mouseBtton(message->button, False);
+			touchscreen->mouseButton(message->button, False);
 			break;
 		case 6:
 			BOOST_LOG_TRIVIAL(info) << "receive start request";
@@ -122,8 +126,10 @@ int main(int argc, const char* argv[])
 	// init keysym mapper
 	//keysym_init();
 	x11input = new X11FakeInput(":0");
+	touchscreen = new SRD_Touchscreen(x11input->getWidth(), x11input->getHeight());
 	kb = new SRD_Keyboard();
-	mouse = new SRD_Mouse();
+	//mouse = new SRD_Mouse();
+
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
 	// start network service
 	SRD_server_init_listen();

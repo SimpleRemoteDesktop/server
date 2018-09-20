@@ -11,7 +11,10 @@
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
 
-SRD_Touchscreen::SRD_Touchscreen() {
+SRD_Touchscreen::SRD_Touchscreen(int desktopWidth, int desktopHeight) {
+
+	this->width = desktopWidth;
+	this->height = desktopHeight;
 
 	struct uinput_user_dev uidev;
 
@@ -39,7 +42,7 @@ SRD_Touchscreen::SRD_Touchscreen() {
 
 
 	memset(&uidev, 0, sizeof(uidev));
-	snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "SRD mouse input");
+	snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "SRD Touchscreen input driver");
 	uidev.id.bustype = BUS_USB;
 	uidev.id.vendor  = 0x1;
 	uidev.id.product = 0x1F2;
@@ -55,7 +58,7 @@ SRD_Touchscreen::SRD_Touchscreen() {
 int SRD_Touchscreen::mouseButton(int button, int isDown) {
 	memset(&ev, 0, sizeof(ev));
 	gettimeofday(&ev.time, NULL);
-	BOOST_LOG_TRIVIAL(info) << "mouse button :" << button << " isDown: "  << isDown;
+	//BOOST_LOG_TRIVIAL(info) << "mouse button :" << button << " isDown: "  << isDown;
 	ev.type = EV_KEY;
 	switch(button) {
 		case 1:
@@ -75,18 +78,20 @@ int SRD_Touchscreen::mouseButton(int button, int isDown) {
 		fprintf(stderr, "error: write");
 }
 
-int SRD_Touchscreen::mouseMove(int x, int y) {
+int SRD_Touchscreen::mouseMove(float  fx, float fy) {
+	int x = (int) this->width * fx;
+	int y = (int) this->height * fy;
 	memset(&ev, 0, sizeof(struct input_event));
 	gettimeofday(&ev.time, NULL);
-	ev.type = EV_REL;
-	ev.code = REL_X;
+	ev.type = EV_ABS;
+	ev.code = ABS_X;
 	ev.value = x;
 	if(write(fd, &ev, sizeof(struct input_event)) < 0)
 		fprintf(stderr, "error: write");
 
 	memset(&ev, 0, sizeof(struct input_event));
-	ev.type = EV_REL;
-	ev.code = REL_Y;
+	ev.type = EV_ABS;
+	ev.code = ABS_Y;
 	ev.value = y;
 	if(write(fd, &ev, sizeof(struct input_event)) < 0)
 		fprintf(stderr, "error: write");
