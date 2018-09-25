@@ -11,6 +11,11 @@
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include "../fifo.hpp"
+#include "../config.h"
+#include "NetworkReceiveThread.h"
+#include "NetworkSendThread.h"
+
 
 using namespace std;
 using namespace boost::asio;
@@ -20,12 +25,19 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 
 class Network {
 public:
-    Network(int port);
+    Network(int port, Fifo<Message> *messageQueue, Fifo<SRD_Buffer_Frame> *frameQueue);
     void listen();
+
+    socket_ptr sock;
+    Fifo<Message> *messageQueue;
+    Fifo<SRD_Buffer_Frame> *frameQueue;
+    NetworkReceiveThread *receiveThread;
+    NetworkSendThread *sendThread;
 
 private:
     int port;
     io_service io;
+
 };
 
 

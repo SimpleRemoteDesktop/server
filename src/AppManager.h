@@ -12,18 +12,19 @@
 #include "input/SRD_Mouse.h"
 #include "videoCapture/VideoCapture.h"
 #include "sound/SoundManager.h"
-#include "network.hpp"
+#include "network/Network.h"
 
 class AppManager {
 public:
     AppManager(bool withNvEnc);
     ~AppManager();
-    void messageHandler(Message* message);
+    void start();
     void stop();
 
 
 private:
-    void start(bool withSound);
+    void messageLoop();
+    void startStream(bool withSound);
     void initInput();
     bool withNvEnc;
     Fifo<SRD_Buffer_Frame> *queueToNetwork;
@@ -38,6 +39,8 @@ private:
     int codecHeight;
     int bandwidth;
     int fps;
+    int port;
+    Network *network;
 };
 
 

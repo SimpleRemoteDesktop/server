@@ -3,10 +3,13 @@
 //
 
 #include "NetworkReceiveThread.h"
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 NetworkReceiveThread::NetworkReceiveThread(Fifo<Message> *queue, socket_ptr sock) {
  this->queue = queue;
  this->sock = sock;
+ BOOST_LOG_TRIVIAL(debug) << "Creating network receive thread";
 }
 
 void NetworkReceiveThread::start() {
@@ -31,4 +34,5 @@ void NetworkReceiveThread::start() {
             m = (Message*)data;
             queue->push(m);
         }
+        BOOST_LOG_TRIVIAL(debug) << "Network receive thread exited";
 }

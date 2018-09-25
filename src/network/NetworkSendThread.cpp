@@ -3,10 +3,13 @@
 //
 
 #include "NetworkSendThread.h"
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
-NetworkSendThread::NetworkSendThread(Fifo<SRD_Buffer_Frame> *queue, socket_ptr *sock) {
+NetworkSendThread::NetworkSendThread(Fifo<SRD_Buffer_Frame> *queue, socket_ptr sock) {
     this->queue = queue;
     this->sock = sock;
+    BOOST_LOG_TRIVIAL(debug) << "Creating network send thread";
 }
 
 void NetworkSendThread::start() {
@@ -21,7 +24,7 @@ void NetworkSendThread::start() {
             memcpy(fullFrame + 4, (void *) &frame->size, 4);
             memcpy(fullFrame + 8, (void *) frame->data, frame->size);
 
-            boost::asio::write(this->sock, buffer(fullFrame, frame->size + 8));
+            boost::asio::write(*this->sock, buffer(fullFrame, frame->size + 8));
             free(fullFrame);
         } else {
             boost::this_thread::sleep(boost::posix_time::milliseconds(1));
@@ -29,6 +32,8 @@ void NetworkSendThread::start() {
 
 
     }
+
+    BOOST_LOG_TRIVIAL(debug) << "Network send thread Exited";
 }
 
 void NetworkSendThread::stop() {

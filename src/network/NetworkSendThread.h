@@ -22,14 +22,14 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 
 class NetworkSendThread {
 public:
-    NetworkSendThread(Fifo<SRD_Buffer_Frame>* queue, socket_ptr *sock);
+    NetworkSendThread(Fifo<SRD_Buffer_Frame>* queue, socket_ptr sock);
     void start();
     void stop();
 
 private:
     Fifo<SRD_Buffer_Frame> *queue;
-    socket_ptr *sock;
-    bool isRunning false;
+    socket_ptr sock;
+    bool isRunning = false;
 };
 
 
