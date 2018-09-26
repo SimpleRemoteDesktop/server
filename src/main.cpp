@@ -2,8 +2,6 @@
 #include <iostream>
 #include <boost/log/trivial.hpp>
 #include <boost/log/expressions.hpp>
-
-
 #include "AppManager.h"
 
 bool withNvEnc = false;
