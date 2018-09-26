@@ -95,3 +95,7 @@ Image* X11Grab::read() {
 
 	return image;
 }
+
+X11Grab::~X11Grab() {
+
+}

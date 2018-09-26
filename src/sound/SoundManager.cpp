@@ -3,14 +3,15 @@
 //
 
 #include "SoundManager.h"
-
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
 
 void sound_capture_thread_fn(SoundManager* soundManager) { //TODO lambda
     soundManager->capture();
 }
 
 SoundManager::SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue) {
-    fprintf(stdout, "creating pulseaudio context\n");
+    BOOST_LOG_TRIVIAL(debug) << "creating pulseaudio context";
     this->outputqueue = outputqueue;
     pa_usec_t delay = 0;
 
@@ -24,16 +25,16 @@ SoundManager::SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue) {
 
     pa_ctx = pa_simple_new(NULL, "Simple Remote desktop audio source", PA_STREAM_RECORD, NULL, "srd record stream", &pa_spec, NULL, NULL, &error);
     if(pa_ctx == NULL) {
-        fprintf(stderr, "audio source: pulseaudio initialization failed - %d:%s.\n", error, pa_strerror(error));
+        BOOST_LOG_TRIVIAL(error) << "audio source: pulseaudio initialization failed - "<< error<< " : " << pa_strerror(error);
     }
     pa_simple_get_latency(pa_ctx, &error);
     if(error)  {
-        fprintf(stderr, " unable to retreive pulseaudio latency \n %d \n %s \n", error,pa_strerror(error));
+        BOOST_LOG_TRIVIAL(error) << " unable to retreive pulseaudio latency " << error << " " << pa_strerror(error);
     }
-    fprintf(stdout, " plusaudio latency %d \n", delay);
+    BOOST_LOG_TRIVIAL(debug) << " plusaudio latency " << delay;
 
 
-    fprintf(stdout, "init pulseaudio ended \n");
+    BOOST_LOG_TRIVIAL(debug) << "init pulseaudio ended";
 
 
 
@@ -41,22 +42,21 @@ SoundManager::SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue) {
     encoder = opus_encoder_create(48000, 2, OPUS_APPLICATION_AUDIO, &err);
     if (err<0)
     {
-        fprintf(stderr, "failed to create an encoder: %s\n", opus_strerror(err));
+        BOOST_LOG_TRIVIAL(error) << "failed to create an encoder: " << opus_strerror(err);
         exit(1);
     }
-    fprintf(stdout, "coucou\n");
     err = opus_encoder_ctl(encoder, OPUS_SET_BITRATE(128000));
     if (err<0)
     {
-        fprintf(stderr, "failed to set bitrate: %s\n", opus_strerror(err));
+        BOOST_LOG_TRIVIAL(error) << "failed to set bitrate: " << opus_strerror(err);
         exit(1);
     }
-    fprintf(stdout, "init finished \n");
+    BOOST_LOG_TRIVIAL(debug) << "init finished";
 }
 
 void SoundManager::start() {
 
-    fprintf(stdout, "sending start sound encoder:\n");
+    BOOST_LOG_TRIVIAL(info) << "sending start sound encoder";
     boost::thread socketSendThread(boost::bind(sound_capture_thread_fn, this));
 
 
@@ -69,15 +69,17 @@ void SoundManager::capture() {
 
         SRD_Buffer_Frame* srd_buffer_frame = new SRD_Buffer_Frame();
         unsigned char * buffer = (unsigned char*) malloc(3840);
+        memset(buffer, 0, 3840);
         int err = pa_simple_read(pa_ctx, buffer, 3840, &error);
         if( err < 0) { //FIXME size
-            fprintf(stderr, "pulseaudio read failed %d \n", error); //TODO throw error
+            BOOST_LOG_TRIVIAL(error) << "pulseaudio read failed " << error; //TODO throw error
         }
         unsigned char* output;
+        output = (unsigned char*) malloc(3*1276);
         int nbBytes = opus_encode(encoder, (opus_int16*) buffer, 960, output, 3840*8);
         if (nbBytes<0)
         {
-            fprintf(stderr, "encode failed: %s\n", opus_strerror(nbBytes));
+            BOOST_LOG_TRIVIAL(error) << "encode failed: " << opus_strerror(nbBytes);
             //FIXME exit
         }
         //fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
@@ -91,6 +93,7 @@ void SoundManager::capture() {
 }
 
 void SoundManager::stop() {
- this->isRunning = false;
+    BOOST_LOG_TRIVIAL(info) << "stopping sound manager loop";
+    this->isRunning = false;
 }
 

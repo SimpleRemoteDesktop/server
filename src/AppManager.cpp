@@ -103,7 +103,17 @@ void AppManager::start() {
 
 void AppManager::stopStream() {
     this->videoCapture->stop();
+    delete this->videoCapture;
     this->soundManager->stop();
+    delete this->soundManager;
+    BOOST_LOG_TRIVIAL(debug) << "cleaning SRD Frame Buffer queue";
+    bool clean = true;
+    while(clean) {
+        SRD_Buffer_Frame* frame = this->queueToNetwork->get();
+        if(!frame) {
+            clean = false;
+        }
+    }
 }
 
 void AppManager::appLoop() {

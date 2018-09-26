@@ -64,3 +64,8 @@ void VideoCapture::capture() {
 
 
 }
+
+VideoCapture::~VideoCapture() {
+ delete this->grab;
+ delete this->encoder;
+}
