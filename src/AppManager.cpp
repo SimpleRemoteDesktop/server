@@ -35,7 +35,9 @@ void AppManager::startStream(bool withSound) {
 }
 
 void AppManager::messageLoop() {
-    while (true) {
+    BOOST_LOG_TRIVIAL(info) << "entering Message loop";
+    bool isWaitingMessage = true;
+    while (isWaitingMessage) {
         Message* message = this->queueFromNetwork->get();
         if(message) {
             switch (message->type) {
@@ -73,7 +75,9 @@ void AppManager::messageLoop() {
                     this->startStream(true);
                     break;
                 case TYPE_ENCODER_STOP:
-                    this->stop();
+                    BOOST_LOG_TRIVIAL(info) << "Receive stop stream";
+                    isWaitingMessage = false;
+                    this->stopStream();
                     break;
                 default:
                     break;
@@ -83,6 +87,7 @@ void AppManager::messageLoop() {
             boost::this_thread::sleep(boost::posix_time::milliseconds(1));
         }
     }
+    BOOST_LOG_TRIVIAL(info) << "Exited message loop";
 }
 
 void AppManager::stop() {
@@ -92,7 +97,19 @@ void AppManager::stop() {
 
 void AppManager::start() {
     this->initInput();
+    this->appLoop();
+
+}
+
+void AppManager::stopStream() {
+    this->videoCapture->stop();
+    this->soundManager->stop();
+}
+
+void AppManager::appLoop() {
     this->network->listen();
     this->messageLoop();
+    BOOST_LOG_TRIVIAL(info) << "appLoop, retstarting network listen";
+    this->appLoop();
 
 }

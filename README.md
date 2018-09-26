@@ -7,3 +7,12 @@ cmake .
 LIBRARY_PATH=/usr/lib/nvidia-396:$LIBRARY_PATH make
 ./src/SRDserver
 ```
+
+you can start stream with NVIDIA encoder with : 
+
+```bash
+
+./src/SRDServer +nvenc
+
+```
+

@@ -63,7 +63,8 @@ void SoundManager::start() {
 }
 
 void SoundManager::capture() {
-    while(true) {
+    this->isRunning = true;
+    while(this->isRunning) {
 
 
         SRD_Buffer_Frame* srd_buffer_frame = new SRD_Buffer_Frame();
@@ -87,5 +88,9 @@ void SoundManager::capture() {
 
         outputqueue->push(srd_buffer_frame);
     }
+}
+
+void SoundManager::stop() {
+ this->isRunning = false;
 }
 

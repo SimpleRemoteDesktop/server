@@ -25,7 +25,9 @@ public:
 private:
     void messageLoop();
     void startStream(bool withSound);
+    void stopStream();
     void initInput();
+    void appLoop();
     bool withNvEnc;
     Fifo<SRD_Buffer_Frame> *queueToNetwork;
     Fifo<Message> *queueFromNetwork;

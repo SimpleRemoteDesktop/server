@@ -29,6 +29,7 @@ private:
 	pa_simple * pa_ctx = NULL;
 	OpusEncoder *encoder;
 	int error;
+	bool isRunning;
 };
 
 #endif //SIMPLEREMOTEDESKTOP_SERVER_SOUNDMANAGER_H

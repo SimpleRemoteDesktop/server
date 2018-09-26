@@ -26,8 +26,9 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 class Network {
 public:
     Network(int port, Fifo<Message> *messageQueue, Fifo<SRD_Buffer_Frame> *frameQueue);
+    ~Network();
     void listen();
-
+    void stop();
     socket_ptr sock;
     Fifo<Message> *messageQueue;
     Fifo<SRD_Buffer_Frame> *frameQueue;

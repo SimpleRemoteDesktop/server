@@ -23,11 +23,13 @@ void NetworkSendThread::start() {
             memcpy(fullFrame, (void *) &frame->type, 4);
             memcpy(fullFrame + 4, (void *) &frame->size, 4);
             memcpy(fullFrame + 8, (void *) frame->data, frame->size);
-
-            boost::asio::write(*this->sock, buffer(fullFrame, frame->size + 8));
+            try {
+                boost::asio::write(*this->sock, buffer(fullFrame, frame->size + 8));
+            } catch (const std::exception &e) {
+                BOOST_LOG_TRIVIAL(error) << "cannot write, TCP socket broken";
+            }
             free(fullFrame);
         } else {
-            boost::this_thread::sleep(boost::posix_time::milliseconds(1));
         }
 
 
@@ -38,4 +40,8 @@ void NetworkSendThread::start() {
 
 void NetworkSendThread::stop() {
     this->isRunning = false;
+}
+
+NetworkSendThread::~NetworkSendThread() {
+this->stop();
 }

@@ -23,10 +23,13 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 class NetworkReceiveThread {
 public:
     NetworkReceiveThread(Fifo<Message> *queue, socket_ptr sock);
+    ~NetworkReceiveThread();
     void start();
+    void stop();
 private:
     Fifo<Message> *queue;
     socket_ptr sock;
+    bool isRunning = false;
 };
 
 

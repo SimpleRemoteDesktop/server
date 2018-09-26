@@ -35,7 +35,8 @@ void VideoCapture::start() {
 }
 
 void VideoCapture::stop() {
-
+    BOOST_LOG_TRIVIAL(info) << "Stopping video thread";
+    this->isRunningThread = false;
 }
 
 void VideoCapture::capture() {

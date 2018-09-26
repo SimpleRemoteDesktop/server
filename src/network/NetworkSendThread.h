@@ -23,6 +23,7 @@ typedef boost::shared_ptr<tcp::socket> socket_ptr;
 class NetworkSendThread {
 public:
     NetworkSendThread(Fifo<SRD_Buffer_Frame>* queue, socket_ptr sock);
+    ~NetworkSendThread();
     void start();
     void stop();
 

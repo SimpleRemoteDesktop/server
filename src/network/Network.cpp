@@ -12,9 +12,14 @@ using ip::tcp;
 
 void receiveThreadFn(Network* network)
 {
-   BOOST_LOG_TRIVIAL(debug) << "called receive thread fn";
+    BOOST_LOG_TRIVIAL(debug) << "called receive thread fn";
     network->receiveThread = new NetworkReceiveThread(network->messageQueue, network->sock);
-    network->receiveThread->start();
+    try {
+        network->receiveThread->start();
+    } catch(const std::exception &e) {
+        BOOST_LOG_TRIVIAL(info) << "catch network error stopping";
+        network->stop();
+    }
 }
 
 void sendThreadFn(Network* network)
@@ -33,12 +38,21 @@ Network::Network(int port, Fifo<Message> *messageQueue, Fifo<SRD_Buffer_Frame> *
 
 void Network::listen() {
     tcp::acceptor a(this->io, tcp::endpoint(tcp::v4(), this->port));
-        socket_ptr sock(new tcp::socket(this->io));
-        BOOST_LOG_TRIVIAL(info) << "Network : Wainting for new connection";
-        a.accept(*sock);
-        this->sock = sock;
-        std::cout << "new socket connected" << std::endl;
-        boost::thread socketReceiveThread(boost::bind(receiveThreadFn, this));
-        boost::thread socketSendThread(boost::bind(sendThreadFn, this));
+    socket_ptr sock(new tcp::socket(this->io));
+    BOOST_LOG_TRIVIAL(info) << "Network : Wainting for new connection";
+    a.accept(*sock);
+    this->sock = sock;
+    std::cout << "new socket connected" << std::endl;
+    boost::thread socketReceiveThread(boost::bind(receiveThreadFn, this));
+    boost::thread socketSendThread(boost::bind(sendThreadFn, this));
 
+}
+
+void Network::stop() {
+    delete this->receiveThread;
+    delete this->sendThread;
+}
+
+Network::~Network() {
+    this->stop();
 }
