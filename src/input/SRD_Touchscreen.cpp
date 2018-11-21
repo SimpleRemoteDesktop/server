@@ -58,7 +58,7 @@ SRD_Touchscreen::SRD_Touchscreen(int desktopWidth, int desktopHeight) {
 int SRD_Touchscreen::mouseButton(int button, int isDown) {
 	memset(&ev, 0, sizeof(ev));
 	gettimeofday(&ev.time, NULL);
-	//BOOST_LOG_TRIVIAL(info) << "mouse button :" << button << " isDown: "  << isDown;
+	BOOST_LOG_TRIVIAL(info) << "mouse button :" << button << " isDown: "  << isDown;
 	ev.type = EV_KEY;
 	switch(button) {
 		case 1:

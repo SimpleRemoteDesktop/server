@@ -49,6 +49,7 @@ NVENC_Encoder::NVENC_Encoder(int width, int height, int codecWidth, int codecHei
     }
 
     this->encoder = NvPipe_CreateEncoder(NVPIPE_RGBA32, NVPIPE_H264, NVPIPE_LOSSY,this->bit_rate, this->fps);
+    BOOST_LOG_TRIVIAL(info) << "Created NVENC encoder";
 
 
 
@@ -63,6 +64,7 @@ SRD_Buffer_Frame *NVENC_Encoder::encode(Image *image) {
         const int outLineSize[1] = {4 * this->codecWidth };
         unsigned char* dstData[1] = { (unsigned char * ) image->data };
         sws_scale(sws_ctx, (uint8_t const * const *) srcData, inLinesize, 0, this->height, dstData, outLineSize);
+
     }
 
     uint64_t compressedSize = NvPipe_Encode(this->encoder, image->data, this->codecWidth * 4, compressed.data(), compressed.size(),this->codecWidth, this->codecHeight, false);

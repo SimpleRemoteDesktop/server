@@ -19,7 +19,7 @@
 class SoundManager {
 public:
 	SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue);
-	void start();
+	boost::thread start();
 	void stop();
 	void capture();
 	Fifo<SRD_Buffer_Frame> *outputqueue;

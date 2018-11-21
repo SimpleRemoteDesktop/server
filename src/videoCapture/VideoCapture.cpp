@@ -29,9 +29,10 @@ VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fp
 
 }
 
-void VideoCapture::start() {
+boost::thread VideoCapture::start() {
     this->isRunningThread = true;
     boost::thread socketSendThread(boost::bind(videoCapture_running_thread_fn, this));
+    return socketSendThread;
 }
 
 void VideoCapture::stop() {

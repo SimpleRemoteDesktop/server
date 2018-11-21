@@ -30,6 +30,7 @@ void NetworkSendThread::start() {
             }
             free(fullFrame);
         } else {
+            boost::this_thread::sleep(boost::posix_time::milliseconds(2));
         }
 
 

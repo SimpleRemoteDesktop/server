@@ -19,7 +19,7 @@ class VideoCapture {
 public:
     VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc);
     ~VideoCapture();
-    void start();
+    boost::thread start();
     void stop();
 
     void capture();

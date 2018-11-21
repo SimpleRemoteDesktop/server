@@ -49,6 +49,8 @@ void Network::listen() {
 }
 
 void Network::stop() {
+    this->sendThread->stop();
+    this->receiveThread->stop();
     delete this->receiveThread;
     delete this->sendThread;
 }

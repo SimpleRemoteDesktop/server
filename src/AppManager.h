@@ -13,10 +13,11 @@
 #include "videoCapture/VideoCapture.h"
 #include "sound/SoundManager.h"
 #include "network/Network.h"
+#include "input/SRD_Touchscreen.h"
 
 class AppManager {
 public:
-    AppManager(bool withNvEnc);
+    AppManager(bool withNvEnc, bool withSound);
     ~AppManager();
     void start();
     void stop();
@@ -24,7 +25,7 @@ public:
 
 private:
     void messageLoop();
-    void startStream(bool withSound);
+    void startStream();
     void stopStream();
     void initInput();
     void appLoop();
@@ -32,10 +33,13 @@ private:
     Fifo<SRD_Buffer_Frame> *queueToNetwork;
     Fifo<Message> *queueFromNetwork;
     X11FakeInput *x11input;
+    SRD_Touchscreen * touchscreen;
     SRD_Keyboard *kb;
     SRD_Mouse *mouse;
     VideoCapture *videoCapture;
     SoundManager *soundManager;
+    boost::thread videoThread;
+    boost::thread soundThread;
 
     int codecWidth;
     int codecHeight;
@@ -43,6 +47,7 @@ private:
     int fps;
     int port;
     Network *network;
+    bool withSound = true;
 };
 
 

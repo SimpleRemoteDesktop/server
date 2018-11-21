@@ -4,8 +4,9 @@
 
 #include "AppManager.h"
 
-AppManager::AppManager(bool withNvEnc) {
+AppManager::AppManager(bool withNvEnc, bool withSound) {
     this->withNvEnc = withNvEnc;
+    this->withSound = withSound;
     this->queueToNetwork = new Fifo<SRD_Buffer_Frame>();
     this->queueFromNetwork = new Fifo<Message>();
     this->port = 8001;
@@ -19,17 +20,16 @@ void AppManager::initInput() {
     this->x11input = new X11FakeInput(":0");
     this->kb = new SRD_Keyboard();
     this->mouse = new SRD_Mouse();
+    this->touchscreen = new SRD_Touchscreen(this->x11input->getWidth(), this->x11input->getHeight());
 }
 
-void AppManager::startStream(bool withSound) {
+void AppManager::startStream() {
     //TODO check
-    this->videoCapture = new VideoCapture(this->codecWidth, this->codecHeight, this->bandwidth, this->fps,
-                                          this->queueToNetwork, this->withNvEnc);
-    this->videoCapture->start();
 
-    if (withSound) {
-        this->soundManager = new SoundManager(queueToNetwork);
-        this->soundManager->start();
+    this->videoThread = this->videoCapture->start();
+
+    if (this->withSound) {
+        this->soundThread = this->soundManager->start();
     }
 
 }
@@ -38,8 +38,8 @@ void AppManager::messageLoop() {
     BOOST_LOG_TRIVIAL(info) << "entering Message loop";
     bool isWaitingMessage = true;
     while (isWaitingMessage) {
-        Message* message = this->queueFromNetwork->get();
-        if(message) {
+        Message *message = this->queueFromNetwork->get();
+        if (message) {
             switch (message->type) {
                 case TYPE_KEY_DOWN:
 
@@ -52,13 +52,16 @@ void AppManager::messageLoop() {
                     kb->press(message->scancode, 0);
                     break;
                 case TYPE_MOUSE_DOWN:
-                    x11input->mouseBtton(message->button, True);
+                    this->touchscreen->mouseButton(message->button, true);
+                    //x11input->mouseBtton(message->button, True);
                     break;
                 case TYPE_MOUSE_UP:
-                    x11input->mouseBtton(message->button, False);
+                    this->touchscreen->mouseButton(message->button, false);
+                    //x11input->mouseBtton(message->button, False);
                     break;
                 case TYPE_MOUSE_MOTION:
-                    x11input->mouseMove(message->x, message->y);
+                    this->touchscreen->mouseMove(message->x, message->y);
+                    //x11input->mouseMove(message->x, message->y);
                     break;
                 case TYPE_ENCODER_START:
                     BOOST_LOG_TRIVIAL(info) << "receive start request";
@@ -72,7 +75,7 @@ void AppManager::messageLoop() {
                     this->bandwidth = message->bandwidth;
                     this->fps = message->fps;
 
-                    this->startStream(true);
+                    this->startStream();
                     break;
                 case TYPE_ENCODER_STOP:
                     BOOST_LOG_TRIVIAL(info) << "Receive stop stream";
@@ -96,6 +99,11 @@ void AppManager::stop() {
 }
 
 void AppManager::start() {
+    this->videoCapture = new VideoCapture(this->codecWidth, this->codecHeight, this->bandwidth, this->fps,
+                                          this->queueToNetwork, this->withNvEnc);
+    if (this->withSound) {
+        this->soundManager = new SoundManager(queueToNetwork);
+    }
     this->initInput();
     this->appLoop();
 
@@ -103,15 +111,17 @@ void AppManager::start() {
 
 void AppManager::stopStream() {
     this->videoCapture->stop();
-    delete this->videoCapture;
+    this->videoThread.join();
     this->soundManager->stop();
-    delete this->soundManager;
+    this->soundThread.join();
     BOOST_LOG_TRIVIAL(debug) << "cleaning SRD Frame Buffer queue";
     bool clean = true;
-    while(clean) {
-        SRD_Buffer_Frame* frame = this->queueToNetwork->get();
-        if(!frame) {
+    while (clean) {
+        SRD_Buffer_Frame *frame = this->queueToNetwork->get();
+        if (!frame) {
             clean = false;
+        } else {
+            free(frame);
         }
     }
 }

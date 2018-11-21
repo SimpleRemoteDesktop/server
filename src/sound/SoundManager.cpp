@@ -29,7 +29,7 @@ SoundManager::SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue) {
     }
     pa_simple_get_latency(pa_ctx, &error);
     if(error)  {
-        BOOST_LOG_TRIVIAL(error) << " unable to retreive pulseaudio latency " << error << " " << pa_strerror(error);
+        BOOST_LOG_TRIVIAL(error) << " unable to retreive pulseaudio latency "; // << error << " " << pa_strerror(error);
     }
     BOOST_LOG_TRIVIAL(debug) << " plusaudio latency " << delay;
 
@@ -54,10 +54,11 @@ SoundManager::SoundManager(Fifo<SRD_Buffer_Frame> * outputqueue) {
     BOOST_LOG_TRIVIAL(debug) << "init finished";
 }
 
-void SoundManager::start() {
+boost::thread SoundManager::start() {
 
     BOOST_LOG_TRIVIAL(info) << "sending start sound encoder";
     boost::thread socketSendThread(boost::bind(sound_capture_thread_fn, this));
+    return socketSendThread;
 
 
 }
@@ -76,20 +77,27 @@ void SoundManager::capture() {
         }
         unsigned char* output;
         output = (unsigned char*) malloc(3*1276);
-        int nbBytes = opus_encode(encoder, (opus_int16*) buffer, 960, output, 3840*8);
-        if (nbBytes<0)
-        {
-            BOOST_LOG_TRIVIAL(error) << "encode failed: " << opus_strerror(nbBytes);
-            //FIXME exit
+        int nbBytes;
+        if(this->isRunning) {
+            nbBytes = opus_encode(encoder, (opus_int16 *) buffer, 960, output, 3840 * 8);
+            if (nbBytes < 0) {
+                BOOST_LOG_TRIVIAL(error) << "encode failed: " << opus_strerror(nbBytes);
+                //FIXME exit
+            }
         }
-        //fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
-        srd_buffer_frame->size = nbBytes;
-        srd_buffer_frame->data = output;
-        srd_buffer_frame->type = SRD_AUDIO_FRAME;
-        free(buffer);
+        if(this->isRunning) {
+            //fprintf(stdout, "encoder output nbBytes %d \n",nbBytes); //TODO
+            srd_buffer_frame->size = nbBytes;
+            srd_buffer_frame->data = output;
+            srd_buffer_frame->type = SRD_AUDIO_FRAME;
+            free(buffer);
 
-        outputqueue->push(srd_buffer_frame);
+            outputqueue->push(srd_buffer_frame);
+        }
+
     }
+
+    pa_simple_free(this->pa_ctx);
 }
 
 void SoundManager::stop() {
