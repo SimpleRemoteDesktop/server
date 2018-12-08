@@ -10,7 +10,7 @@ int main(int argc, const char* argv[])
 {
 
 	boost::log::core::get()->set_filter (
-			boost::log::trivial::severity >= boost::log::trivial::debug
+			boost::log::trivial::severity >= boost::log::trivial::info
 			);
 
 
@@ -22,7 +22,7 @@ int main(int argc, const char* argv[])
 	}
 
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
-	AppManager* app = new AppManager(withNvEnc);
+	AppManager* app = new AppManager(withNvEnc, false);
 	app->start();
 
 }

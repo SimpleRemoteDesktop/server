@@ -25,6 +25,11 @@ void AppManager::initInput() {
 
 void AppManager::startStream() {
     //TODO check
+    this->videoCapture = new VideoCapture(this->codecWidth, this->codecHeight, this->bandwidth, this->fps,
+                                          this->queueToNetwork, this->withNvEnc);
+    if (this->withSound) {
+        this->soundManager = new SoundManager(queueToNetwork);
+    }
 
     this->videoThread = this->videoCapture->start();
 
@@ -63,6 +68,10 @@ void AppManager::messageLoop() {
                     this->touchscreen->mouseMove(message->x, message->y);
                     //x11input->mouseMove(message->x, message->y);
                     break;
+                case TYPE_MOUSE_RELATIVE_MOTION:
+                    fprintf(stdout, "relative mouse x: %d, y: %d \n", message->x, message->y);
+                    this->mouse->mouseMove(message->x, message->y);
+                    break;
                 case TYPE_ENCODER_START:
                     BOOST_LOG_TRIVIAL(info) << "receive start request";
                     BOOST_LOG_TRIVIAL(info) << " codec width " << message->codec_width;
@@ -99,11 +108,6 @@ void AppManager::stop() {
 }
 
 void AppManager::start() {
-    this->videoCapture = new VideoCapture(this->codecWidth, this->codecHeight, this->bandwidth, this->fps,
-                                          this->queueToNetwork, this->withNvEnc);
-    if (this->withSound) {
-        this->soundManager = new SoundManager(queueToNetwork);
-    }
     this->initInput();
     this->appLoop();
 
