@@ -69,8 +69,8 @@ void AppManager::messageLoop() {
                     //x11input->mouseMove(message->x, message->y);
                     break;
                 case TYPE_MOUSE_RELATIVE_MOTION:
-                    fprintf(stdout, "relative mouse x: %d, y: %d \n", message->x, message->y);
-                    this->mouse->mouseMove(message->x, message->y);
+                    fprintf(stdout, "relative mouse x: %d, y: %d \n", (int) (message->x * this->x11input->getWidth()), (int) (message->y* this->x11input->getHeight()));
+                    this->mouse->mouseMove((int) (message->x * this->x11input->getWidth()),(int) (message->y * this->x11input->getHeight()));
                     break;
                 case TYPE_ENCODER_START:
                     BOOST_LOG_TRIVIAL(info) << "receive start request";
