@@ -34,6 +34,7 @@ private:
     int fps;
     int codecWidth;
     int codecHeight;
+    int interval;
     bool isScale;
     SwsContext *sws_ctx;
     AVFrame *frame;

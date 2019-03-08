@@ -16,7 +16,7 @@ NVENC_Encoder::NVENC_Encoder(int width, int height, int codecWidth, int codecHei
     this->codecHeight = codecHeight;
     this->bit_rate = bit_rate;
     this->fps = fps;
-
+    this->interval = 0;
     this->isScale = !((this->width == this->codecWidth) && (this->height == this->codecHeight));
 
     if(this->isScale) {
@@ -66,8 +66,16 @@ SRD_Buffer_Frame *NVENC_Encoder::encode(Image *image) {
         sws_scale(sws_ctx, (uint8_t const * const *) srcData, inLinesize, 0, this->height, dstData, outLineSize);
 
     }
+    bool requestIFrame = false;
+    if(this->interval >= 120) {
+        requestIFrame = true;
+        this->interval = 0;
+    }
 
-    uint64_t compressedSize = NvPipe_Encode(this->encoder, image->data, this->codecWidth * 4, compressed.data(), compressed.size(),this->codecWidth, this->codecHeight, false);
+
+    uint64_t compressedSize = NvPipe_Encode(this->encoder, image->data, this->codecWidth * 4, compressed.data(), compressed.size(),this->codecWidth, this->codecHeight, requestIFrame);
+
+    this->interval++;
 
     SRD_Buffer_Frame *encodedFrame = new SRD_Buffer_Frame();
     encodedFrame->data = (unsigned char *) malloc(compressedSize);
