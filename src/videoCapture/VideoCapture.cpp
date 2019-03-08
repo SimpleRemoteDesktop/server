@@ -21,11 +21,15 @@ VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fp
 
     //this->grab = new FrameBufferGrab();
     this->grab = new X11Grab();
+#ifdef WITH_NVENC
     if(this->withNvEnc) {
         this->encoder  = new NVENC_Encoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps);
     } else {
         this->encoder = new SoftwareEncoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps, 1);
     }
+#else
+    this->encoder = new SoftwareEncoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps, 1);
+#endif
 
 }
 

@@ -1,7 +1,7 @@
 //
 // Created by sylvain on 29/08/18.
 //
-
+#ifdef WITH_NVENC
 #include <vector>
 #include <cstring>
 #include "NVENC_Encoder.h"
@@ -85,3 +85,5 @@ SRD_Buffer_Frame *NVENC_Encoder::encode(Image *image) {
 
     return encodedFrame;
 }
+
+#endif

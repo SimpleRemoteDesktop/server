@@ -49,24 +49,24 @@ void AppManager::messageLoop() {
                 case TYPE_KEY_DOWN:
 
                     //fprintf(stdout, "keycode %d, scancode %d \n", message->keycode, message->scancode);
-                    //SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 1);
-                    kb->press(message->scancode, 1);
+                    this->x11input->keypress_with_keysym(message->keycode, 1);
+                    //kb->press(message->scancode, 1);
                     break;
                 case TYPE_KEY_UP:
-                    //SRD_X11_display_keypress_with_keysym(get_keysym(message->keycode), 0);
-                    kb->press(message->scancode, 0);
+                    this->x11input->keypress_with_keysym(message->keycode, 0);
+                    //kb->press(message->scancode, 0);
                     break;
                 case TYPE_MOUSE_DOWN:
-                    this->touchscreen->mouseButton(message->button, true);
-                    //x11input->mouseBtton(message->button, True);
+                    //this->touchscreen->mouseButton(message->button, true);
+                    x11input->mouseBtton(message->button, True);
                     break;
                 case TYPE_MOUSE_UP:
-                    this->touchscreen->mouseButton(message->button, false);
-                    //x11input->mouseBtton(message->button, False);
+                    //this->touchscreen->mouseButton(message->button, false);
+                    x11input->mouseBtton(message->button, False);
                     break;
                 case TYPE_MOUSE_MOTION:
-                    this->touchscreen->mouseMove(message->x, message->y);
-                    //x11input->mouseMove(message->x, message->y);
+                    //this->touchscreen->mouseMove(message->x, message->y);
+                    x11input->mouseMove(message->x, message->y);
                     break;
                 case TYPE_MOUSE_RELATIVE_MOTION:
                     //fprintf(stdout, "relative mouse x: %d, y: %d \n", (int) (message->x * this->x11input->getWidth()), (int) (message->y* this->x11input->getHeight()));

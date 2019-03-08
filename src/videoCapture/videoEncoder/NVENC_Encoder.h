@@ -1,7 +1,7 @@
 //
 // Created by sylvain on 29/08/18.
 //
-
+#ifdef WITH_NVENC
 #ifndef SIMPLEREMOTEDESKTOP_SERVER_NVENC_ENCODER_H
 #define SIMPLEREMOTEDESKTOP_SERVER_NVENC_ENCODER_H
 extern "C" {
@@ -42,3 +42,4 @@ private:
 
 
 #endif //SIMPLEREMOTEDESKTOP_SERVER_NVENC_ENCODER_H
+#endif

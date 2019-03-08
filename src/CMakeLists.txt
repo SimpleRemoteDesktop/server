@@ -15,14 +15,18 @@ find_package(FFmpeg)
 find_package(Opus)
 find_package(PulseAudio)
 
+add_executable (SRDServer ${SRC} )
+target_link_libraries( SRDServer network input sound videoCapture videoGrab videoEncoder
+        ${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
 
 add_subdirectory(input)
 add_subdirectory(sound)
 add_subdirectory(network)
 add_subdirectory(videoCapture)
-set(NVPIPE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-add_subdirectory(NvPipe)
+if(WITH_NVENC)
+	set(NVPIPE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+	add_subdirectory(NvPipe)
+	target_link_libraries(SRDServer NvPipe)
+endif()
 
-add_executable (SRDServer ${SRC} )
-target_link_libraries( SRDServer network input sound videoCapture videoGrab videoEncoder NvPipe
-        ${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
+
