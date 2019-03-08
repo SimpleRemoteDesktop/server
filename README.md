@@ -18,9 +18,9 @@ You must install cuda SDK from Nvidia web site
 
 ```
 cmake . // software encoder only
-cmake --WITH_NVENC // Nvidia NVENC encoder support 
+cmake -DWITH_NVENC=ON . // Nvidia NVENC encoder support 
 
-make . // build
+make // build
 ```
 
 ## run application
