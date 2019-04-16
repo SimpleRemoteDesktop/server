@@ -7,7 +7,7 @@ SimpleRemoteDesktop screen sharing server
 ### required
 
 ```
-apt-get install libboost-dev libxtst-dev libavutil-dev libavcodec-dev libswscale-dev libx264-dev libboost-thread-dev libboost-dev cmake libboost-log1.58-dev libopus-dev
+apt-get install build-essential libboost-dev libxtst-dev libavutil-dev libavcodec-dev libswscale-dev libx264-dev libboost-thread-dev libboost-dev cmake libboost-log1.58-dev libopus-dev libpulse-dev libsdl2-dev 
 ```
 
 ### option NVENC

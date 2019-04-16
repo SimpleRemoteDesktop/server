@@ -40,7 +40,7 @@ SoftwareEncoder::SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth
 		 * then gop_size is ignored and the output of encoder
 		 * will always be I frame irrespective to gop_size
 		 */
-		c->gop_size = 100;
+		c->gop_size = 120;
 		c->max_b_frames = 0;
 		c->refs = 0;
 		//c->pix_fmt = AV_PIX_FMT_YUV420P; //AV_PIX_FMT_YUV444P;

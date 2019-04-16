@@ -31,4 +31,4 @@ if(WITH_NVENC)
 	target_link_libraries(SRDServer NvPipe)
 endif()
 
-
+install(TARGETS SRDServer DESTINATION bin)

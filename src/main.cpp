@@ -22,7 +22,7 @@ int main(int argc, const char* argv[])
 	}
 
 	BOOST_LOG_TRIVIAL(info) << " Simple Remote desktop server version 0.2";
-	AppManager* app = new AppManager(withNvEnc, false);
+	AppManager* app = new AppManager(withNvEnc, true);
 	app->start();
 
 }
