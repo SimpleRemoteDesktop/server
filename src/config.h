@@ -9,7 +9,8 @@ enum type {
     TYPE_MOUSE_UP = 5,
     TYPE_ENCODER_START = 6,
     TYPE_ENCODER_STOP = 7,
-    TYPE_MOUSE_RELATIVE_MOTION = 8
+    TYPE_MOUSE_RELATIVE_MOTION = 8,
+    TYPE_ENCODER_TJPEG = 9
 };
 
 #ifdef __cplusplus

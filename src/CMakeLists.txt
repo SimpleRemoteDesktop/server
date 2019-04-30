@@ -16,8 +16,8 @@ find_package(Opus)
 find_package(PulseAudio)
 
 add_executable (SRDServer ${SRC} )
-target_link_libraries( SRDServer network input sound videoCapture videoGrab videoEncoder
-        ${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
+target_link_libraries( SRDServer network input sound videoCapture videoGrab videoEncoder -lturbojpeg
+	${PULSEAUDIO_LIBRARY} -lpulse-simple ${Opus_LIBRARY} ${Boost_LIBRARIES} ${FFMPEG_LIBRARIES} ${XTEST_LIBRARY} ${X11_LIBRARY} ${XEXT_LIBRARY} ${XFIXES_LIBRARY} ${Threads_LIBRARIES})
 
 add_subdirectory(input)
 add_subdirectory(sound)
@@ -29,6 +29,10 @@ if(WITH_NVENC)
 	set(NVPIPE_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 	add_subdirectory(NvPipe)
 	target_link_libraries(SRDServer NvPipe)
+endif()
+
+if(WITH_TJPEG)
+	message("Turbo JPEG Encoder option enable")
 endif()
 
 install(TARGETS SRDServer DESTINATION bin)

@@ -25,7 +25,7 @@ public:
 
 private:
     void messageLoop();
-    void startStream();
+    void startStream(bool picture);
     void stopStream();
     void initInput();
     void appLoop();

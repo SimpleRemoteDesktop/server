@@ -23,10 +23,10 @@ void AppManager::initInput() {
     this->touchscreen = new SRD_Touchscreen(this->x11input->getWidth(), this->x11input->getHeight());
 }
 
-void AppManager::startStream() {
+void AppManager::startStream(bool pictureMode) {
     //TODO check
     this->videoCapture = new VideoCapture(this->codecWidth, this->codecHeight, this->bandwidth, this->fps,
-                                          this->queueToNetwork, this->withNvEnc);
+                                          this->queueToNetwork, this->withNvEnc, pictureMode);
     if (this->withSound) {
         this->soundManager = new SoundManager(queueToNetwork);
     }
@@ -84,13 +84,16 @@ void AppManager::messageLoop() {
                     this->bandwidth = message->bandwidth;
                     this->fps = message->fps;
 
-                    this->startStream();
+                    this->startStream(false);
                     break;
                 case TYPE_ENCODER_STOP:
                     BOOST_LOG_TRIVIAL(info) << "Receive stop stream";
                     isWaitingMessage = false;
                     this->stopStream();
                     break;
+		case TYPE_ENCODER_TJPEG:
+		    this->startStream(true);
+		    break;
                 default:
                     break;
 

@@ -8,7 +8,7 @@ void videoCapture_running_thread_fn(VideoCapture* videoCapture) {
     videoCapture->capture();
 }
 
-VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc) {
+VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc, bool withTjpeg) {
 
     this->outputQueue = queueToNetwork;
     this->codecWidth = codecWidth;
@@ -16,13 +16,22 @@ VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fp
     this->bit_rate = bit_rate;
     this->fps = fps;
     this->withNvEnc = withNvEnc;
-
+    this->withTjpeg = withTjpeg;
     this->duration = (float) 1000 / this->fps;
-
     //this->grab = new FrameBufferGrab();
     this->grab = new X11Grab();
+    this->initEncoder(this->withNvEnc, this->withTjpeg);
+}
+
+void VideoCapture::initEncoder(bool withNvenc, bool withTjpeg) {
+#ifdef WITH_TJPEG
+    if(withTjpeg) {
+ 	this->encoder = new TJPEG_Encoder(this->grab->width, this->grab->height, 0, 0);
+	return;
+    }
+#endif
 #ifdef WITH_NVENC
-    if(this->withNvEnc) {
+    if(withNvEnc) {
         this->encoder  = new NVENC_Encoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps);
     } else {
         this->encoder = new SoftwareEncoder(this->grab->width, this->grab->height, this->codecWidth, this->codecHeight, this->bit_rate, this->fps, 1);
@@ -32,6 +41,7 @@ VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fp
 #endif
 
 }
+
 
 boost::thread VideoCapture::start() {
     this->isRunningThread = true;

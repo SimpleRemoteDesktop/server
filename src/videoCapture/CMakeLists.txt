@@ -8,4 +8,8 @@ file(GLOB SRC
 if(WITH_NVENC)
 	add_definitions(-DWITH_NVENC)
 endif()
+
+if(WITH_TJPEG)
+	add_definitions(-DWITH_TJPEG)
+endif()
 add_library(videoCapture videoGrab videoEncoder ${SRC})

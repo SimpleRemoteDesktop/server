@@ -8,6 +8,7 @@
 
 #include "./videoGrab/FrameBufferGrab.h"
 #include "./videoEncoder/SoftwareEncoder.h"
+#include "./videoEncoder/TJPEG_Encoder.h"
 #include "./videoEncoder/NVENC_Encoder.h"
 #include "../fifo.hpp"
 #include "videoGrab/X11Grab.h"
@@ -17,9 +18,10 @@
 
 class VideoCapture {
 public:
-    VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc);
+    VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fps, Fifo<SRD_Buffer_Frame> *queueToNetwork, bool withNvEnc, bool withTjpeg);
     ~VideoCapture();
     boost::thread start();
+    void initEncoder(bool withNvEnc, bool withTjpeg);
     void stop();
 
     void capture();
@@ -36,6 +38,7 @@ private:
     bool isRunningThread = false;
     Fifo<SRD_Buffer_Frame> *outputQueue;
     bool withNvEnc;
+    bool withTjpeg;
 };
 
 
