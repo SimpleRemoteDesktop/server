@@ -40,6 +40,7 @@ SoftwareEncoder::SoftwareEncoder(int imageWidth, int imageHeight, int codecWidth
 		 * then gop_size is ignored and the output of encoder
 		 * will always be I frame irrespective to gop_size
 		 */
+		c->level = 30;
 		c->gop_size = 120;
 		c->max_b_frames = 0;
 		c->refs = 0;
