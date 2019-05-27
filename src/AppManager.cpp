@@ -72,6 +72,9 @@ void AppManager::messageLoop() {
                     //fprintf(stdout, "relative mouse x: %d, y: %d \n", (int) (message->x * this->x11input->getWidth()), (int) (message->y* this->x11input->getHeight()));
                     this->mouse->mouseMove((int) message->x ,(int) message->y );
                     break;
+		case TYPE_MOUSE_WHEEL:
+		    this->mouse->wheel((int) message->x, (int) message->y);
+		    break;
                 case TYPE_ENCODER_START:
                     BOOST_LOG_TRIVIAL(info) << "receive start request";
                     BOOST_LOG_TRIVIAL(info) << " codec width " << message->codec_width;

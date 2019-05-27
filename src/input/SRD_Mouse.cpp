@@ -26,6 +26,7 @@ SRD_Mouse::SRD_Mouse() {
 	ioctl(fd, UI_SET_RELBIT, REL_X);
 	ioctl(fd, UI_SET_RELBIT, REL_Y);
 	ioctl(fd, UI_SET_RELBIT, REL_WHEEL);
+	ioctl(fd, UI_SET_RELBIT, REL_HWHEEL);
 
 	ioctl(fd, UI_SET_KEYBIT, BTN_LEFT);
 	ioctl(fd, UI_SET_KEYBIT, BTN_MIDDLE);
@@ -90,4 +91,22 @@ int SRD_Mouse::mouseMove(int x, int y) {
 	ev.value = 0;
 	if(write(fd, &ev, sizeof(struct input_event)) < 0)
 		fprintf(stderr, "error: write");
+}
+
+int SRD_Mouse::wheel(int x, int y) {
+	memset(&ev, 0, sizeof(struct input_event));
+	gettimeofday(&ev.time, NULL);
+	ev.type = EV_REL;
+	ev.code = REL_HWHEEL;
+	ev.value = x * 3;
+	if(write(fd, &ev, sizeof(struct input_event)) < 0)
+		fprintf(stderr, "error: write");
+
+	memset(&ev, 0, sizeof(struct input_event));
+	ev.type = EV_REL;
+	ev.code = REL_WHEEL;
+	ev.value = y * 3;
+	if(write(fd, &ev, sizeof(struct input_event)) < 0)
+		fprintf(stderr, "error: write");
+
 }

@@ -19,6 +19,7 @@ public:
     ~SRD_Mouse();
     int mouseMove(int x, int y);
     int mouseButton(int button, int isDown);
+    int wheel(int x, int y);
 private:
     struct input_event ev;
     int fd;
