@@ -15,8 +15,7 @@ SRD_Touchscreen::SRD_Touchscreen(int desktopWidth, int desktopHeight) {
 
 	this->width = desktopWidth;
 	this->height = desktopHeight;
-
-	struct uinput_user_dev uidev;
+	int version, rc;
 
 	fd = open("/dev/input/uinput", O_WRONLY | O_NONBLOCK);
 	if(fd < 0)
@@ -25,6 +24,8 @@ SRD_Touchscreen::SRD_Touchscreen(int desktopWidth, int desktopHeight) {
 	if(fd < 0)
 		fprintf(stderr, "error: open \"/dev/input/uinput\" and \"/dev/uinput\"");
 
+	ioctl(fd, UI_GET_VERSION, &version);
+
 	ioctl(fd, UI_SET_EVBIT, EV_KEY);
 	ioctl(fd, UI_SET_EVBIT, EV_SYN);
 	ioctl(fd, UI_SET_EVBIT, EV_MSC);
@@ -32,33 +33,62 @@ SRD_Touchscreen::SRD_Touchscreen(int desktopWidth, int desktopHeight) {
 	ioctl(fd, UI_SET_EVBIT, EV_ABS);
 	ioctl(fd, UI_SET_ABSBIT, ABS_X);
 	ioctl(fd, UI_SET_ABSBIT, ABS_Y);
-	ioctl(fd, UI_SET_ABSBIT, ABS_PRESSURE);
-	ioctl(fd, UI_SET_RELBIT, ABS_WHEEL);
 
-	ioctl(fd, UI_SET_KEYBIT, BTN_DIGI); // Indicates this is an absolute mouse
+//	ioctl(fd, UI_SET_KEYBIT, BTN_DIGI); // Indicates this is an absolute mouse
 	ioctl(fd, UI_SET_KEYBIT, BTN_LEFT);
 	ioctl(fd, UI_SET_KEYBIT, BTN_MIDDLE);
-	ioctl(fd, UI_SET_KEYBIT, BTN_RIGHT);
+//	ioctl(fd, UI_SET_KEYBIT, BTN_RIGHT);
 
+	struct uinput_abs_setup abs_setup;
+	
+	memset(&abs_setup, 0, sizeof(abs_setup));
+        abs_setup.code = ABS_X;
+        abs_setup.absinfo.value = 0;
+        abs_setup.absinfo.minimum = 0;
+        abs_setup.absinfo.maximum = UINT16_MAX;
+        abs_setup.absinfo.fuzz = 0;
+        abs_setup.absinfo.flat = 0;
+       // abs_setup.absinfo.resolution = 400;
+        if (ioctl(fd, UI_ABS_SETUP, &abs_setup) < 0)
+		printf("error: UI_ABS_SETUP ABS_X");
+        
+	memset(&abs_setup, 0, sizeof(abs_setup));
+        abs_setup.code = ABS_Y;
+        abs_setup.absinfo.value = 0;
+        abs_setup.absinfo.minimum = 0;
+        abs_setup.absinfo.maximum = UINT16_MAX;
+        abs_setup.absinfo.fuzz = 0;
+        abs_setup.absinfo.flat = 0;
+        //abs_setup.absinfo.resolution = 400;
+        if (ioctl(fd, UI_ABS_SETUP, &abs_setup) < 0)
+		printf("error: UI_ABS_SETUP ABS_Y");
 
-	memset(&uidev, 0, sizeof(uidev));
-	snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "SRD Touchscreen input driver");
-	uidev.id.bustype = BUS_USB;
-	uidev.id.vendor  = 0x1;
-	uidev.id.product = 0x1F2;
-	uidev.id.version = 2;
+        memset(&abs_setup, 0, sizeof(abs_setup));
+        abs_setup.code = ABS_PRESSURE;
+        abs_setup.absinfo.value = 0;
+        abs_setup.absinfo.minimum = 0;
+        abs_setup.absinfo.maximum = INT16_MAX;
+        abs_setup.absinfo.fuzz = 0;
+        abs_setup.absinfo.flat = 0;
+        abs_setup.absinfo.resolution = 0;
+        if (ioctl(fd, UI_ABS_SETUP, &abs_setup) < 0)
+	 	printf("error: UI_ABS_SETUP ABS_PRESSURE");
 
-	if(write(fd, &uidev, sizeof(uidev)) < 0)
-		fprintf(stderr, "error: write &uidev");
+	struct uinput_setup usetup;
+	memset(&usetup, 0, sizeof(usetup));
+	usetup.id.bustype = BUS_USB;
+	usetup.id.vendor = 0x1;
+	usetup.id.product = 0x1F5;
+	strcpy(usetup.name, "SRD Touchscreen input driver uinput api v5");
 
-	if(ioctl(fd, UI_DEV_CREATE) < 0)
-		fprintf(stderr, "error: ioctl UI_DEV_CREATE");
+	ioctl(fd, UI_DEV_SETUP, &usetup);
+	ioctl(fd, UI_DEV_CREATE);
 }
 
 int SRD_Touchscreen::mouseButton(int button, int isDown) {
 	memset(&ev, 0, sizeof(ev));
 	gettimeofday(&ev.time, NULL);
-	BOOST_LOG_TRIVIAL(info) << "mouse button :" << button << " isDown: "  << isDown;
+	BOOST_LOG_TRIVIAL(debug) << "mouse button :" << button << " isDown: "  << isDown;
 	ev.type = EV_KEY;
 	switch(button) {
 		case 1:

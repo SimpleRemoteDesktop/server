@@ -34,7 +34,7 @@ private:
     int codecHeight;
     int bit_rate;
     int fps;
-    float duration;
+    int duration;
     bool isRunningThread = false;
     Fifo<SRD_Buffer_Frame> *outputQueue;
     bool withNvEnc;

@@ -8,7 +8,7 @@
 
 SRD_Mouse::SRD_Mouse() {
 
-	struct uinput_user_dev uidev;
+	int version, rc;
 
 	fd = open("/dev/input/uinput", O_WRONLY | O_NONBLOCK);
 	if(fd < 0)
@@ -16,6 +16,8 @@ SRD_Mouse::SRD_Mouse() {
 
 	if(fd < 0)
 		fprintf(stderr, "error: open \"/dev/input/uinput\" and \"/dev/uinput\"");
+
+	ioctl(fd, UI_GET_VERSION, &version);
 
 	ioctl(fd, UI_SET_EVBIT, EV_KEY);
 	ioctl(fd, UI_SET_EVBIT, EV_SYN);
@@ -32,6 +34,20 @@ SRD_Mouse::SRD_Mouse() {
 	ioctl(fd, UI_SET_KEYBIT, BTN_MIDDLE);
 	ioctl(fd, UI_SET_KEYBIT, BTN_RIGHT);
 
+	if(rc == 0 && version >=5) {
+    	struct uinput_setup usetup;
+	memset(&usetup, 0,sizeof(usetup));
+        usetup.id.bustype = BUS_USB;
+	usetup.id.vendor = 0x1;
+	usetup.id.product = 0x1F2;
+	strcpy(usetup.name, "SRD mouse input uinput api 5");
+
+	ioctl(fd, UI_DEV_SETUP, &usetup);
+	ioctl(fd, UI_DEV_CREATE);
+        	
+	} else {
+
+	struct uinput_user_dev uidev;
 	memset(&uidev, 0, sizeof(uidev));
 	snprintf(uidev.name, UINPUT_MAX_NAME_SIZE, "SRD mouse input");
 	uidev.id.bustype = BUS_USB;
@@ -44,6 +60,7 @@ SRD_Mouse::SRD_Mouse() {
 
 	if(ioctl(fd, UI_DEV_CREATE) < 0)
 		fprintf(stderr, "error: ioctl UI_DEV_CREATE");
+	}
 }
 
 int SRD_Mouse::mouseButton(int button, int isDown) {

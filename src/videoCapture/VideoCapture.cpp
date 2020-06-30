@@ -17,7 +17,7 @@ VideoCapture::VideoCapture(int codecWidth, int codecHeight, int bit_rate, int fp
     this->fps = fps;
     this->withNvEnc = withNvEnc;
     this->withTjpeg = withTjpeg;
-    this->duration = (float) 1000 / this->fps;
+    this->duration = int(1000 / this->fps);
     //this->grab = new FrameBufferGrab();
     this->grab = new X11Grab();
     this->initEncoder(this->withNvEnc, this->withTjpeg);

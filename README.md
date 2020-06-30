@@ -34,3 +34,8 @@ make // build
 ./src/SRDServer +nvenc
 ```
 
+## uinput acces denied
+
+```
+chmod +0666 /dev/uinput
+```
